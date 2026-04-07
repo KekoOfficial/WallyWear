@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>MALLY | Finalizar Pedido</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <div class="checkout-form">
+        <h2>DATOS DE ENTREGA</h2>
+        <input type="text" id="cust-name" placeholder="Nombre y Apellido" required>
+        <input type="tel" id="cust-phone" placeholder="WhatsApp (Ej: 0981...)" required>
+        <select id="cust-city">
+            <option value="Asuncion">Asunción / Gran Asunción</option>
+            <option value="Interior">Interior del País</option>
+        </select>
+        <textarea id="cust-address" placeholder="Dirección exacta para el delivery"></textarea>
+
+        <div class="payment-box">
+            <p>PAGO SEGURO VÍA MERCADO PAGO PY</p>
+            <button class="btn-buy" id="btn-pay" onclick="procesarPago()">PAGAR AHORA</button>
+        </div>
+    </div>
+</body>
+</html>
