@@ -2,12 +2,12 @@ import telebot
 import requests
 
 # === CONFIGURACIÓN DE PODER (JERARQUÍA) ===
-TOKEN = "TU_TOKEN_DE_BOTFATHER_AQUI"
+TOKEN = "8795507175:AAEf9ujkj_jUMJZeChq6L1bFeS8IMRNFwt4"
 bot = telebot.TeleBot(TOKEN)
 
 # IDs de Telegram (Sustituir por los números reales)
-ID_FUNDADOR = 123456789  # Eder Villalba
-ID_CREADOR = 987654321   # Oliver Favero
+ID_FUNDADOR = 8729717891  # Eder Villalba
+ID_CREADOR = 8630490789  # Oliver Favero
 
 # Diccionario de Gerentes (ID: Nombre)
 GERENTES = {
