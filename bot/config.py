@@ -2,12 +2,15 @@
 TOKEN = "8795507175:AAEf9ujkj_jUMJZeChq6L1bFeS8IMRNFwt4"
 
 # --- JERARQUÍA DEL IMPERIO IMP ---
-# Usa @userinfobot en Telegram para obtener estos números
-FOUNDER_ID = 123456789  # <--- REEMPLAZA CON TU ID (Oliver/Noa)
+# Identidades verificadas según tu reporte:
 
+# Fundador: Eder Villalba
+FOUNDER_ID = 8729717891
+
+# Gerentes Autorizados: Keko Russu y otros
 GERENTES = [
-    987654321,  # ID de Hazem Titán
-    112233445,  # ID de Eder
+    8630490789,  # Keko Russu
+    # Puedes agregar más IDs aquí separados por coma
 ]
 
 # URL del servidor Flask en Termux
