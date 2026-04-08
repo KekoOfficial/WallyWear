@@ -1,56 +1,74 @@
 import telebot
 import requests
+from config import TOKEN, FOUNDER_ID, GERENTES, API_URL
 
-TOKEN = "8795507175:AAEf9ujkj_jUMJZeChq6L1bFeS8IMRNFwt4" # Tu token de BotFather
 bot = telebot.TeleBot(TOKEN)
-API_URL = "http://127.0.0.1:5000/api/admin/add"
 
-@bot.message_handler(func=lambda message: True)
-def procesar_pedido(message):
-    texto = message.text
-    lineas = [l.strip() for l in texto.split('\n') if l.strip()]
+def obtener_rango(user_id):
+    if user_id == FOUNDER_ID:
+        return "FOUNDER"
+    elif user_id in GERENTES:
+        return "GERENTE"
+    return None
+
+@bot.message_handler(content_types=['text', 'photo'])
+def manejar_entrada(message):
+    user_id = message.from_user.id
+    rango = obtener_rango(user_id)
+
+    # 1. Seguridad: Solo Fundador y Gerentes
+    if not rango:
+        bot.reply_to(message, "🚫 Acceso Denegado. No perteneces al staff de Imperio IMP.")
+        return
+
+    # 2. Extraer texto (ya sea de una foto o mensaje solo)
+    texto = message.caption if message.content_type == 'photo' else message.text
     
-    # Validamos que el mensaje empiece con "subir"
-    if not lineas[0].lower().startswith("subir"):
-        return # Si no empieza con subir, ignoramos
+    if not texto or not texto.lower().startswith("subir"):
+        return
 
     try:
-        # Extraemos tipo de producto de la primera línea
-        tipo = lineas[0].split(" ", 1)[1] if len(lineas[0].split(" ")) > 1 else "General"
+        # Separar por líneas y limpiar espacios
+        lineas = [l.strip() for l in texto.split('\n') if l.strip()]
         
-        # Asignamos variables según el orden que pediste
+        # Estructura según tu pedido:
+        # [0] Subir Tipo / [1] Nombre / [2] Tamaño / [3] Colores / [4] Precio
+        tipo = lineas[0].split(" ", 1)[1] if len(lineas[0].split(" ")) > 1 else "Prenda"
         nombre = lineas[1]
         tallas = lineas[2]
         colores = lineas[3]
-        
-        # Precio: Si hay una 5ta línea, es precio, si no, lo dejamos en 0
         precio = int(lineas[4]) if len(lineas) > 4 else 0
         
-        # Imagen: Buscamos un link en el mensaje
-        foto = "https://via.placeholder.com/400"
-        for l in lineas:
-            if l.startswith("http"):
-                foto = l
+        # 3. Procesar Imagen
+        foto_url = ""
+        if message.content_type == 'photo':
+            # Obtenemos la URL de la foto directamente de Telegram
+            file_info = bot.get_file(message.photo[-1].file_id)
+            foto_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
+        else:
+            # Si es solo texto, buscamos si hay un link http
+            for l in lineas:
+                if l.startswith("http"): foto_url = l
 
+        # 4. Enviar datos al servidor Flask
         payload = {
             "type": tipo,
             "name": nombre,
             "price": precio,
-            "sizes": tallas,
-            "img": foto,
-            "user": message.from_user.first_name
+            "sizes": f"{tallas} | {colores}",
+            "img": foto_url,
+            "user": f"[{rango}] {message.from_user.first_name}"
         }
 
-        # Conectar al servidor Flask
-        response = requests.post(API_URL, json=payload)
+        response = requests.post(API_URL, json=payload, timeout=10)
         
         if response.status_code == 200:
-            bot.reply_to(message, f"✅ **{tipo.upper()} AGREGADA**\n📦 {nombre}\n💰 {precio} Gs\n🎨 {colores}")
+            bot.reply_to(message, f"✅ **{tipo.upper()} PUBLICADA**\n👤 Por: {message.from_user.first_name}\n🛡️ Rango: {rango}\n💰 {precio:,} Gs.")
         else:
-            bot.reply_to(message, "❌ Servidor no responde. ¿Está prendido el `app.py` en Termux?")
+            bot.reply_to(message, "❌ Error: Flask está apagado o la DB no conectó.")
 
     except Exception as e:
-        bot.reply_to(message, "⚠️ Error de formato. Usa este esquema:\n\nSubir [Tipo]\nNombre\nTamaño\nColores\nPrecio\nLinkImagen")
+        bot.reply_to(message, "⚠️ Error de formato. Enviá así:\n\nSubir [Tipo]\nNombre\nTalles\nColores\nPrecio\n(Adjuntar foto)")
 
-print("🤖 BOT ACTIVO: Esperando órdenes...")
+print(f"🚀 Bot Mally Wear activo. Fundador: {FOUNDER_ID}")
 bot.polling()
