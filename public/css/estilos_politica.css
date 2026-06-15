@@ -1,0 +1,16 @@
+.texto-politica {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.texto-politica h3 {
+    margin: 1.5rem 0 0.8rem;
+    color: #222;
+}
+
+.texto-politica p {
+    margin-bottom: 1rem;
+    text-align: justify;
+}
