@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Wally Wear - Pedidos</title>
+    <link rel="stylesheet" href="css/admin_pedidos.css">
+</head>
+<body>
+    <div id="acceso-admin">
+        <h2>Acceso Administrador</h2>
+        <input type="password" id="input-id-admin" placeholder="Ingresar ID de acceso">
+        <button onclick="verificarAcceso()">Ingresar</button>
+    </div>
+
+    <div id="panel" style="display: none;">
+        <h1>Gestión de Pedidos</h1>
+        <div id="lista-pedidos"></div>
+    </div>
+
+    <script>
+        const ID_SECRETA = "TU_ID_AQUI"; // ⚠️ MISMA ID QUE EL OTRO PANEL
+
+        function verificarAcceso() {
+            const ingreso = document.getElementById("input-id-admin").value.trim();
+            if (ingreso === ID_SECRETA) {
+                document.getElementById("acceso-admin").style.display = "none";
+                document.getElementById("panel").style.display = "block";
+                cargarPedidos();
+            } else {
+                alert("❌ ID incorrecta");
+            }
+        }
+
+        function cargarPedidos() {
+            const contenedor = document.getElementById("lista-pedidos");
+            const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+            contenedor.innerHTML = "";
+
+            if (pedidos.length === 0) {
+                contenedor.innerHTML = "<p>No hay pedidos registrados</p>";
+                return;
+            }
+
+            pedidos.forEach((pedido, index) => {
+                let detalle = pedido.productos.map(p => `${p.nombre} x${p.cantidad} = Gs ${(p.precio * p.cantidad).toLocaleString()}`).join("<br>");
+                
+                contenedor.innerHTML += `
+                    <div class="pedido">
+                        <h3>ID: ${pedido.id}</h3>
+                        <p>Fecha: ${pedido.fecha}</p>
+                        <p>Estado: <strong>${pedido.estado}</strong></p>
+                        <p>Productos:<br>${detalle}</p>
+                        <p>Total: Gs ${pedido.total.toLocaleString()}</p>
+                        ${pedido.estado === "Pendiente de pago" ? 
+                            `<button onclick="confirmarPago(${index})">✅ Confirmar pago recibido</button>` : 
+                            `<span>✅ Pago confirmado</span>`
+                        }
+                    </div>
+                `;
+            });
+        }
+
+        function confirmarPago(index) {
+            const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+            pedidos[index].estado = "Pago confirmado - En preparación";
+            localStorage.setItem("pedidos", JSON.stringify(pedidos));
+            cargarPedidos();
+            alert("✅ Pedido confirmado correctamente");
+        }
+    </script>
+</body>
+</html>
