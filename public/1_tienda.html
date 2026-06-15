@@ -5,38 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wally Wear - Tienda</title>
     <link rel="stylesheet" href="css/estilos_generales.css">
-    <link rel="stylesheet" href="css/estilos_tienda.css">
-    <link rel="stylesheet" href="css/estilos_responsivo.css">
 </head>
 <body>
     <header>
         <h1>Wally Wear</h1>
         <nav>
             <a href="1_tienda.html">Tienda</a>
-            <a href="2_carrito.html">Carrito (<span id="contador-carrito">0</span>)</a>
+            <a href="2_carrito.html">Carrito (<span id="contador">0</span>)</a>
             <a href="3_politica_privacidad.html">Políticas</a>
+            <a href="../admin/1_panel_productos.html">Acceso Admin</a>
         </nav>
     </header>
 
     <main>
-        <!-- Secciones/Divisiones -->
         <section id="remeras" class="categoria">
             <h2>Remeras</h2>
-            <div class="productos-lista" id="lista-remeras">
-                <!-- Los productos se cargan automáticamente -->
-            </div>
+            <div class="productos-lista" id="lista-remeras"></div>
         </section>
 
         <section id="zapatillas" class="categoria">
             <h2>Zapatillas</h2>
-            <div class="productos-lista" id="lista-zapatillas">
-            </div>
+            <div class="productos-lista" id="lista-zapatillas"></div>
         </section>
 
         <section id="pantalones" class="categoria">
             <h2>Pantalones</h2>
-            <div class="productos-lista" id="lista-pantalones">
-            </div>
+            <div class="productos-lista" id="lista-pantalones"></div>
         </section>
     </main>
 
@@ -44,50 +38,38 @@
         let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
         actualizarContador();
 
-        // Cargar productos guardados
         function cargarProductos() {
             const productos = JSON.parse(localStorage.getItem("productos")) || [];
             document.querySelectorAll(".productos-lista").forEach(el => el.innerHTML = "");
-            
-            productos.forEach(prod => {
-                const div = document.getElementById(`lista-${prod.categoria.toLowerCase()}`);
+            productos.forEach(p => {
+                const div = document.getElementById(`lista-${p.categoria.toLowerCase()}`);
                 if (!div) return;
-
-                const tarjeta = document.createElement("div");
-                tarjeta.className = "producto";
-                tarjeta.innerHTML = `
-                    <img src="../img/${prod.imagen}" alt="${prod.nombre}">
-                    <h3>${prod.nombre}</h3>
-                    <p>Precio: Gs ${prod.precio.toLocaleString()}</p>
-                    <p>Stock: ${prod.stock} unidades</p>
-                    <button onclick="agregarAlCarrito(${prod.id})" ${prod.stock <= 0 ? "disabled" : ""}>
-                        ${prod.stock <= 0 ? "Sin stock" : "Agregar al carrito"}
-                    </button>
+                div.innerHTML += `
+                    <div class="producto">
+                        <img src="img/${p.imagen}" alt="${p.nombre}">
+                        <h3>${p.nombre}</h3>
+                        <p>Precio: Gs ${p.precio.toLocaleString()}</p>
+                        <p>Stock: ${p.stock}</p>
+                        <button onclick="agregar(${p.id})" ${p.stock < 1 ? "disabled" : ""}>
+                            ${p.stock < 1 ? "Sin stock" : "Agregar al carrito"}
+                        </button>
+                    </div>
                 `;
-                div.appendChild(tarjeta);
             });
         }
 
-        function agregarAlCarrito(id) {
-            const productos = JSON.parse(localStorage.getItem("productos")) || [];
-            const producto = productos.find(p => p.id === id);
-            if (!producto || producto.stock <= 0) return;
-
-            const existe = carrito.find(p => p.id === id);
-            if (existe) {
-                if (existe.cantidad < producto.stock) existe.cantidad++;
-            } else {
-                carrito.push({...producto, cantidad: 1});
-            }
-
+        function agregar(id) {
+            const prod = JSON.parse(localStorage.getItem("productos")).find(x => x.id === id);
+            if (!prod || prod.stock < 1) return;
+            const existe = carrito.find(x => x.id === id);
+            existe ? existe.cantidad++ : carrito.push({...prod, cantidad: 1});
             localStorage.setItem("carrito", JSON.stringify(carrito));
             actualizarContador();
-            alert("✅ Agregado al carrito");
+            alert("✅ Agregado");
         }
 
         function actualizarContador() {
-            const total = carrito.reduce((acc, item) => acc + item.cantidad, 0);
-            document.getElementById("contador-carrito").textContent = total;
+            document.getElementById("contador").textContent = carrito.reduce((a,b) => a + b.cantidad, 0);
         }
 
         window.onload = cargarProductos;
