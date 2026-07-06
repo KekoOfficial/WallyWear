@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wally Wear - Tienda</title>
-    <link rel="stylesheet" href="css/estilos_generales.css">
-    <link rel="stylesheet" href="css/estilos_tienda.css">
-    <link rel="stylesheet" href="css/estilos_responsivo.css">
+    <link rel="stylesheet" href="../css/estilos_generales.css">
+    <link rel="stylesheet" href="../css/estilos_tienda.css">
+    <link rel="stylesheet" href="../css/estilos_responsivo.css">
 </head>
 <body>
     <header>
         <h1>Wally Wear</h1>
         <nav>
-            <a href="1_tienda.html">Tienda</a>
-            <a href="2_carrito.html">Carrito (<span id="contador">0</span>)</a>
-            <a href="4_nosotros.html">Nosotros</a>
-            <a href="3_politica_privacidad.html">Políticas</a>
-            <a href="../admin/0_acceso_admin.html">Acceso Admin</a>
+            <a href="../catalog/index.html">Tienda</a>
+            <a href="../cart/index.html">Carrito (<span id="contador">0</span>)</a>
+            <a href="../home/index.html">Nosotros</a>
+            <a href="../privacy/index.html">Políticas</a>
+            <a href="../../admin/login/index.html">Acceso Admin</a>
         </nav>
     </header>
 
@@ -51,7 +51,7 @@
                 productosCat.forEach(p => {
                     lista.innerHTML += `
                         <div class="producto">
-                            <img src="img/${p.imagen}" alt="${p.nombre}">
+                            <img src="../img/${p.imagen}" alt="${p.nombre}">
                             <h3>${p.nombre}</h3>
                             <p>Precio: Gs ${p.precio.toLocaleString()}</p>
                             <p>Stock: ${p.stock}</p>
@@ -84,6 +84,6 @@
 
         window.onload = cargarProductos;
     </script>
-    <script src="footer.js"></script>
+    <script src="../js/footer.js"></script>
 </body>
 </html>

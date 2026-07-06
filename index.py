@@ -8,7 +8,7 @@ class RedirigirHandler(SimpleHTTPRequestHandler):
         # Si entran a la raíz, redirige directamente a la tienda
         if self.path == "/" or self.path == "/index.html":
             self.send_response(301)
-            self.send_header('Location', '/public/1_tienda.html')
+            self.send_header('Location', '/public/catalog/index.html')
             self.end_headers()
             return
         return super().do_GET()

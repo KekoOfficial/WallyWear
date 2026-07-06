@@ -1,0 +1,5 @@
+# Local files
+server.log
+*.png
+__pycache__/
+.DS_Store

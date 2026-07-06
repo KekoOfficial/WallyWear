@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso Admin - Wally Wear</title>
-    <link rel="stylesheet" href="css/admin_acceso.css">
+    <link rel="stylesheet" href="../css/admin_acceso.css">
 </head>
 <body>
     <div id="acceso-admin">
@@ -30,7 +30,7 @@
                 // Generar un token temporal en sessionStorage
                 sessionStorage.setItem("admin_auth", "true");
                 sessionStorage.setItem("auth_time", Date.now());
-                window.location.href = "1_panel_productos.html";
+                window.location.href = "../products/index.html";
             } else {
                 document.getElementById("error-msg").style.display = "block";
                 document.getElementById("master-key").value = "";

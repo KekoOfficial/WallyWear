@@ -1,0 +1,2 @@
+# Dependencies
+# No external dependencies required for pure HTML/CSS/JS/Python SimpleHTTP

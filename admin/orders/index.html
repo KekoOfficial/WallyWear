@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Wally Wear - Pedidos</title>
-    <link rel="stylesheet" href="css/admin_pedidos.css">
-    <script src="auth_check.js"></script>
+    <link rel="stylesheet" href="../css/admin_pedidos.css">
+    <script src="../security/auth_check.js"></script>
 </head>
 <body>
     <div id="panel">
         <nav style="margin-bottom: 2rem; text-align: center;">
-            <a href="1_panel_productos.html" style="margin: 0 10px;">Productos</a>
-            <a href="2_panel_pedidos.html" style="margin: 0 10px;">Pedidos</a>
-            <a href="3_panel_redes.html" style="margin: 0 10px;">Redes Sociales</a>
-            <a href="../public/1_tienda.html" style="margin: 0 10px;">Ver Tienda</a>
+            <a href="../products/index.html" style="margin: 0 10px;">Productos</a>
+            <a href="../orders/index.html" style="margin: 0 10px;">Pedidos</a>
+            <a href="../social/index.html" style="margin: 0 10px;">Redes Sociales</a>
+            <a href="../../public/catalog/index.html" style="margin: 0 10px;">Ver Tienda</a>
             <button onclick="sessionStorage.clear(); window.location.reload();" style="padding: 5px 10px; background: #c53030; border-radius: 4px; font-size: 0.8rem; width: auto; display: inline-block; vertical-align: middle;">Salir</button>
         </nav>
         <h1>Gestión de Pedidos</h1>
@@ -44,7 +44,7 @@
 
             pedidos.forEach((pedido, index) => {
                 let detalle = pedido.productos.map(p => `${p.nombre} x${p.cantidad} = Gs ${(p.precio * p.cantidad).toLocaleString()}`).join("<br>");
-                
+
                 contenedor.innerHTML += `
                     <div class="pedido">
                         <h3>ID: ${pedido.id}</h3>
@@ -52,7 +52,7 @@
                         <p>Estado: <strong>${pedido.estado}</strong></p>
                         <p>Productos:<br>${detalle}</p>
                         <p>Total: Gs ${pedido.total.toLocaleString()}</p>
-                        ${pedido.estado === "Pendiente de pago" ? 
+                        ${pedido.estado === "Pendiente de pago" ?
                             `<button onclick="confirmarPago('${pedido.id}')">✅ Confirmar pago recibido</button>` :
                             `<span>✅ Pago confirmado</span>`
                         }
