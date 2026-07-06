@@ -14,6 +14,11 @@
     </div>
 
     <div id="panel" style="display: none;">
+        <nav style="margin-bottom: 2rem; text-align: center;">
+            <a href="1_panel_productos.html" style="margin: 0 10px;">Productos</a>
+            <a href="2_panel_pedidos.html" style="margin: 0 10px;">Pedidos</a>
+            <a href="../public/1_tienda.html" style="margin: 0 10px;">Ver Tienda</a>
+        </nav>
         <h1>Gestión de Productos y Categorías</h1>
 
         <section>
@@ -39,7 +44,7 @@
     </div>
 
     <script>
-        const ID_SECRETA = "wally"; // ⚠️ CAMBIA ESTA POR TU ID REAL
+        const ID_SECRETA = "Wally2026";
 
         function verificarAcceso() {
             const ingreso = document.getElementById("input-id-admin").value.trim();
@@ -104,10 +109,12 @@
             productos.forEach(p => {
                 contenedor.innerHTML += `
                     <div class="prod-admin">
-                        <strong>${p.nombre}</strong> | ${p.categoria} <br>
-                        Precio: Gs ${p.precio.toLocaleString()} | Stock: ${p.stock} <br>
-                        Imagen: ${p.imagen} <br>
-                        <button onclick="eliminarProducto(${p.id})">Eliminar</button>
+                        <div class="prod-info">
+                            <strong>${p.nombre}</strong> | ${p.categoria} <br>
+                            Precio: Gs ${p.precio.toLocaleString()} | Stock: ${p.stock} <br>
+                            Imagen: ${p.imagen}
+                        </div>
+                        <button onclick="eliminarProducto(${p.id})" style="background: #dc3545;">Eliminar</button>
                     </div>
                 `;
             });
