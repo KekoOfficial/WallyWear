@@ -13,7 +13,7 @@ function cargarRedesFooter() {
 
     footer.innerHTML = `
         <div id="redes-footer" style="margin-bottom: 1rem;"></div>
-        <p>&copy; ${new Date().getFullYear()} Mally Wear - Todos los derechos reservados</p>
+        <p>&copy; ${new Date().getFullYear()} Wally Wear - Todos los derechos reservados</p>
     `;
     footer.style.background = "#1a1a1a";
     footer.style.color = "white";
