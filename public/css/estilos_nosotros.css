@@ -1,0 +1,37 @@
+.nosotros-seccion {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-top: 2rem;
+}
+
+.nosotros-seccion h2 {
+    margin-bottom: 1.5rem;
+    color: #1a1a1a;
+}
+
+.nosotros-seccion p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    text-align: justify;
+}
+
+footer {
+    background: #1a1a1a;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+    margin-top: 4rem;
+}
+
+#redes-sociales a {
+    color: #eee;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#redes-sociales a:hover {
+    color: #fff;
+    text-decoration: underline;
+}

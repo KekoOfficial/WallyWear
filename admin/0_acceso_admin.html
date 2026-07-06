@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Admin - Mally Wear</title>
+    <link rel="stylesheet" href="css/admin_acceso.css">
+</head>
+<body>
+    <div id="acceso-admin">
+        <h2>🔒 Acceso Restringido</h2>
+        <p>Introduce las credenciales maestras</p>
+
+        <input type="password" id="master-key" placeholder="Contraseña Maestra">
+        <input type="password" id="verify-key" placeholder="Contraseña de Verificación">
+
+        <button onclick="validarAcceso()">Ingresar al Sistema</button>
+        <div id="error-msg" style="color: #c53030; margin-top: 1rem; display: none;">❌ Credenciales incorrectas</div>
+    </div>
+
+    <script>
+        function validarAcceso() {
+            const key1 = document.getElementById("master-key").value.trim();
+            const key2 = document.getElementById("verify-key").value.trim();
+
+            const MASTER = "MallyMaster2026";
+            const VERIFY = "MallyShop_777";
+
+            if (key1 === MASTER && key2 === VERIFY) {
+                // Generar un token temporal en sessionStorage
+                sessionStorage.setItem("admin_auth", "true");
+                sessionStorage.setItem("auth_time", Date.now());
+                window.location.href = "1_panel_productos.html";
+            } else {
+                document.getElementById("error-msg").style.display = "block";
+                document.getElementById("master-key").value = "";
+                document.getElementById("verify-key").value = "";
+
+                // Bloqueo: obligar a recargar
+                setTimeout(() => {
+                    alert("Acceso denegado. La página se recargará.");
+                    window.location.reload();
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

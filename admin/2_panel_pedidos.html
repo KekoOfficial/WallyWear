@@ -5,37 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Mally Wear - Pedidos</title>
     <link rel="stylesheet" href="css/admin_pedidos.css">
+    <script src="auth_check.js"></script>
 </head>
 <body>
-    <div id="acceso-admin">
-        <h2>Acceso Administrador</h2>
-        <input type="password" id="input-id-admin" placeholder="Ingresar ID de acceso">
-        <button onclick="verificarAcceso()">Ingresar</button>
-    </div>
-
-    <div id="panel" style="display: none;">
+    <div id="panel">
         <nav style="margin-bottom: 2rem; text-align: center;">
             <a href="1_panel_productos.html" style="margin: 0 10px;">Productos</a>
             <a href="2_panel_pedidos.html" style="margin: 0 10px;">Pedidos</a>
+            <a href="3_panel_redes.html" style="margin: 0 10px;">Redes Sociales</a>
             <a href="../public/1_tienda.html" style="margin: 0 10px;">Ver Tienda</a>
+            <button onclick="sessionStorage.clear(); window.location.reload();" style="padding: 5px 10px; background: #c53030; border-radius: 4px; font-size: 0.8rem; width: auto; display: inline-block; vertical-align: middle;">Salir</button>
         </nav>
         <h1>Gestión de Pedidos</h1>
         <div id="lista-pedidos"></div>
     </div>
 
     <script>
-        const ID_SECRETA = "Mally2026";
-
-        function verificarAcceso() {
-            const ingreso = document.getElementById("input-id-admin").value.trim();
-            if (ingreso === ID_SECRETA) {
-                document.getElementById("acceso-admin").style.display = "none";
-                document.getElementById("panel").style.display = "block";
-                cargarPedidos();
-            } else {
-                alert("❌ ID incorrecta");
-            }
-        }
 
         function cargarPedidos() {
             const contenedor = document.getElementById("lista-pedidos");
@@ -86,6 +71,7 @@
                 alert("✅ Pedido confirmado correctamente");
             }
         }
+        window.onload = cargarPedidos;
     </script>
 </body>
 </html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Redes - Mally Wear</title>
+    <link rel="stylesheet" href="css/admin_redes.css">
+    <script src="auth_check.js"></script>
+</head>
+<body>
+    <div id="panel">
+        <nav style="margin-bottom: 2rem; text-align: center;">
+            <a href="1_panel_productos.html" style="margin: 0 10px;">Productos</a>
+            <a href="2_panel_pedidos.html" style="margin: 0 10px;">Pedidos</a>
+            <a href="3_panel_redes.html" style="margin: 0 10px;">Redes Sociales</a>
+            <a href="../public/1_tienda.html" style="margin: 0 10px;">Ver Tienda</a>
+            <button onclick="sessionStorage.clear(); window.location.reload();" style="padding: 5px 10px; background: #c53030; border-radius: 4px; font-size: 0.8rem; width: auto; display: inline-block;">Salir</button>
+        </nav>
+
+        <h1>Configuración de Redes Sociales</h1>
+
+        <section>
+            <h3>Agregar / Editar Red Social</h3>
+            <input type="text" id="nombre-red" placeholder="Nombre (Ej: Instagram)">
+            <input type="text" id="url-red" placeholder="Enlace (Ej: https://instagram.com/mallywear)">
+            <select id="estado-red">
+                <option value="Activo">Activo</option>
+                <option value="Oculto">Oculto</option>
+            </select>
+            <button onclick="guardarRed()">Guardar Red Social</button>
+        </section>
+
+        <section>
+            <h3>Redes Configuradas</h3>
+            <div id="lista-redes"></div>
+        </section>
+    </div>
+
+    <script>
+        function cargarRedesAdmin() {
+            const contenedor = document.getElementById("lista-redes");
+            const redes = JSON.parse(localStorage.getItem("redes")) || [
+                { nombre: "Instagram", url: "#", estado: "Activo" },
+                { nombre: "Facebook", url: "#", estado: "Activo" }
+            ];
+            contenedor.innerHTML = "";
+
+            redes.forEach((r, index) => {
+                contenedor.innerHTML += `
+                    <div class="red-item" style="padding: 1rem; background: #f9f9f9; margin: 0.5rem 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${r.nombre}</strong> — ${r.estado}<br>
+                            <small>${r.url}</small>
+                        </div>
+                        <button onclick="eliminarRed(${index})" style="background: #dc3545; width: auto; padding: 5px 10px;">Eliminar</button>
+                    </div>
+                `;
+            });
+            localStorage.setItem("redes", JSON.stringify(redes));
+        }
+
+        function guardarRed() {
+            const nombre = document.getElementById("nombre-red").value.trim();
+            const url = document.getElementById("url-red").value.trim();
+            const estado = document.getElementById("estado-red").value;
+
+            if (!nombre || !url) return alert("Completa los campos");
+
+            const redes = JSON.parse(localStorage.getItem("redes")) || [];
+            redes.push({ nombre, url, estado });
+            localStorage.setItem("redes", JSON.stringify(redes));
+
+            document.getElementById("nombre-red").value = "";
+            document.getElementById("url-red").value = "";
+
+            cargarRedesAdmin();
+            alert("✅ Red social guardada");
+        }
+
+        function eliminarRed(index) {
+            const redes = JSON.parse(localStorage.getItem("redes")) || [];
+            const nombre = redes[index].nombre;
+            if (nombre === "Instagram" || nombre === "Facebook") {
+                return alert("No se pueden eliminar las redes iniciales, solo cambiarlas a 'Oculto'");
+            }
+            if (!confirm("¿Eliminar?")) return;
+            redes.splice(index, 1);
+            localStorage.setItem("redes", JSON.stringify(redes));
+            cargarRedesAdmin();
+        }
+
+        window.onload = cargarRedesAdmin;
+    </script>
+</body>
+</html>
