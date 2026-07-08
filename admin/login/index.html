@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrador - Wally Wear</title>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 10vh auto;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .login-container h2 { margin-bottom: 1.5rem; color: #1a1a1a; }
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.8rem 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        button { width: 100%; margin-top: 1rem; }
+        .error { color: #dc3545; margin-top: 1rem; display: none; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Acceso Restringido</h2>
+        <input type="password" id="pass-master" placeholder="Contraseña Maestra">
+        <input type="password" id="pass-verif" placeholder="Contraseña de Verificación">
+        <button onclick="login()">Ingresar al Panel</button>
+        <p id="error-msg" class="error">❌ Contraseñas incorrectas</p>
+    </div>
+
+    <script>
+        function login() {
+            const master = document.getElementById('pass-master').value;
+            const verif = document.getElementById('pass-verif').value;
+
+            if (master === 'WallyMaster2026' && verif === 'WallyShop_777') {
+                sessionStorage.setItem('admin_auth', 'true');
+                window.location.href = '../1_panel_productos.html';
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

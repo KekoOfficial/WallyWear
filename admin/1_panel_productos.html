@@ -3,17 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Mally Wear - Productos</title>
+    <title>Admin Wally Wear - Productos</title>
+    <script src="security/auth_check.js"></script>
     <link rel="stylesheet" href="css/admin_productos.css">
 </head>
 <body>
-    <div id="acceso-admin">
-        <h2>Acceso Administrador</h2>
-        <input type="password" id="input-id-admin" placeholder="Ingresar ID de acceso">
-        <button onclick="verificarAcceso()">Ingresar</button>
-    </div>
-
-    <div id="panel" style="display: none;">
+    <div id="panel">
         <nav style="margin-bottom: 2rem; text-align: center;">
             <a href="1_panel_productos.html" style="margin: 0 10px;">Productos</a>
             <a href="2_panel_pedidos.html" style="margin: 0 10px;">Pedidos</a>
@@ -29,12 +24,23 @@
 
         <section>
             <h3>Agregar / Editar Producto</h3>
-            <input type="text" id="nombre" placeholder="Nombre del producto">
-            <input type="number" id="precio" placeholder="Precio en Gs">
-            <input type="number" id="stock" placeholder="Cantidad en stock">
-            <input type="text" id="imagen" placeholder="Nombre del archivo en carpeta img (ej: remera1.jpg)">
-            <select id="categoria"></select>
-            <button onclick="guardarProducto()">Guardar Producto</button>
+            <div class="form-grid">
+                <input type="text" id="nombre" placeholder="Nombre del producto">
+                <input type="number" id="precio" placeholder="Precio en Gs">
+                <input type="number" id="stock" placeholder="Cantidad total en stock">
+                <input type="number" id="cantidad_prendas" placeholder="Prendas por lote/unidad">
+                <select id="categoria"></select>
+
+                <div class="image-upload">
+                    <label for="input-foto" class="btn-secundario">Seleccionar imagen</label>
+                    <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="previsualizarImagen(this)">
+                    <input type="hidden" id="imagen-nombre">
+                    <div id="preview-container" style="margin-top: 10px;">
+                        <img id="preview-img" src="" alt="Vista previa" style="max-width: 100px; display: none; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+            <button onclick="guardarProducto()" style="margin-top: 1rem;">Guardar Producto</button>
         </section>
 
         <section>
@@ -43,23 +49,15 @@
         </section>
     </div>
 
+    <script src="../public/js/utils.js"></script>
     <script>
-        const ID_SECRETA = "Wally2026";
-
-        function verificarAcceso() {
-            const ingreso = document.getElementById("input-id-admin").value.trim();
-            if (ingreso === ID_SECRETA) {
-                document.getElementById("acceso-admin").style.display = "none";
-                document.getElementById("panel").style.display = "block";
-                cargarCategorias();
-                cargarProductosAdmin();
-            } else {
-                alert("❌ ID incorrecta");
-            }
-        }
+        window.onload = () => {
+            cargarCategorias();
+            cargarProductosAdmin();
+        };
 
         function cargarCategorias() {
-            const cats = JSON.parse(localStorage.getItem("categorias")) || ["Remeras", "Zapatillas", "Pantalones"];
+            const cats = Utils.storage.get("categorias") || ["Remeras", "Zapatillas", "Pantalones"];
             const select = document.getElementById("categoria");
             select.innerHTML = "";
             cats.forEach(c => {
@@ -73,57 +71,104 @@
         function crearCategoria() {
             const nombre = document.getElementById("nueva-cat").value.trim();
             if (!nombre) return alert("Escribe un nombre");
-            const cats = JSON.parse(localStorage.getItem("categorias")) || [];
+            const cats = Utils.storage.get("categorias") || ["Remeras", "Zapatillas", "Pantalones"];
             if (cats.includes(nombre)) return alert("Ya existe");
             cats.push(nombre);
-            localStorage.setItem("categorias", JSON.stringify(cats));
+            Utils.storage.set("categorias", cats);
             cargarCategorias();
             alert("✅ Categoría creada");
+        }
+
+        function previsualizarImagen(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                const nombreArchivo = input.files[0].name;
+                document.getElementById('imagen-nombre').value = nombreArchivo;
+
+                reader.onload = function(e) {
+                    const img = document.getElementById('preview-img');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         function guardarProducto() {
             const nombre = document.getElementById("nombre").value.trim();
             const precio = parseInt(document.getElementById("precio").value);
             const stock = parseInt(document.getElementById("stock").value);
-            const imagen = document.getElementById("imagen").value.trim();
+            const cantidadPrendas = parseInt(document.getElementById("cantidad_prendas").value);
+            const imagen = document.getElementById("imagen-nombre").value;
             const categoria = document.getElementById("categoria").value;
 
-            if (!nombre || !precio || !stock || !imagen) return alert("Completa todos los campos");
+            if (!nombre || !precio || isNaN(stock) || isNaN(cantidadPrendas) || !imagen) {
+                return alert("Completa todos los campos");
+            }
 
-            const productos = JSON.parse(localStorage.getItem("productos")) || [];
+            const productos = Utils.storage.get("productos") || [];
             const nuevo = {
                 id: Date.now(),
-                nombre, precio, stock, imagen, categoria
+                nombre,
+                precio,
+                stock,
+                cantidadPrendas,
+                imagen,
+                categoria
             };
             productos.push(nuevo);
-            localStorage.setItem("productos", JSON.stringify(productos));
+            Utils.storage.set("productos", productos);
+
+            // Limpiar form
+            document.getElementById("nombre").value = "";
+            document.getElementById("precio").value = "";
+            document.getElementById("stock").value = "";
+            document.getElementById("cantidad_prendas").value = "";
+            document.getElementById("imagen-nombre").value = "";
+            document.getElementById("preview-img").style.display = "none";
+            document.getElementById("input-foto").value = "";
+
             cargarProductosAdmin();
             alert("✅ Producto guardado");
         }
 
         function cargarProductosAdmin() {
             const contenedor = document.getElementById("lista-admin");
-            const productos = JSON.parse(localStorage.getItem("productos")) || [];
+            const productos = Utils.storage.get("productos") || [];
+            const cats = Utils.storage.get("categorias") || ["Remeras", "Zapatillas", "Pantalones"];
             contenedor.innerHTML = "";
 
-            productos.forEach(p => {
-                contenedor.innerHTML += `
-                    <div class="prod-admin">
+            cats.forEach(cat => {
+                const productosCat = productos.filter(p => p.categoria === cat);
+                if (productosCat.length === 0) return;
+
+                const section = document.createElement("div");
+                section.className = "categoria-admin";
+                section.innerHTML = `<h4>${cat}</h4>`;
+
+                productosCat.forEach(p => {
+                    const card = document.createElement("div");
+                    card.className = "prod-admin";
+                    card.innerHTML = `
+                        <img src="../public/img/${p.imagen}" alt="${p.nombre}" class="img-admin">
                         <div class="prod-info">
-                            <strong>${p.nombre}</strong> | ${p.categoria} <br>
-                            Precio: Gs ${p.precio.toLocaleString()} | Stock: ${p.stock} <br>
-                            Imagen: ${p.imagen}
+                            <strong>${p.nombre}</strong><br>
+                            <span class="price">${Utils.formatCurrency(p.precio)}</span><br>
+                            Stock: ${p.stock} | Prendas: ${p.cantidadPrendas || 1}
                         </div>
-                        <button onclick="eliminarProducto(${p.id})" style="background: #dc3545;">Eliminar</button>
-                    </div>
-                `;
+                        <button onclick="eliminarProducto(${p.id})" class="btn-eliminar">Eliminar</button>
+                    `;
+                    section.appendChild(card);
+                });
+                contenedor.appendChild(section);
             });
         }
 
         function eliminarProducto(id) {
-            let productos = JSON.parse(localStorage.getItem("productos")) || [];
+            if(!confirm("¿Eliminar este producto?")) return;
+            let productos = Utils.storage.get("productos") || [];
             productos = productos.filter(p => p.id !== id);
-            localStorage.setItem("productos", JSON.stringify(productos));
+            Utils.storage.set("productos", productos);
             cargarProductosAdmin();
         }
     </script>

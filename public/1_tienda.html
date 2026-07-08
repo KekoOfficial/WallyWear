@@ -10,7 +10,7 @@
 </head>
 <body>
     <header>
-        <h1>Mally Wear</h1>
+        <h1>Wally Wear</h1>
         <nav>
             <a href="1_tienda.html">Tienda</a>
             <a href="2_carrito.html">Carrito (<span id="contador">0</span>)</a>
@@ -23,19 +23,24 @@
         <!-- Las categorías y productos se cargarán dinámicamente -->
     </main>
 
+    <script src="js/utils.js"></script>
     <script>
-        let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-        actualizarContador();
+        let carrito = Utils.storage.get("carrito") || [];
+
+        window.onload = () => {
+            Utils.updateCartCounter();
+            cargarProductos();
+        };
 
         function cargarProductos() {
-            const productos = JSON.parse(localStorage.getItem("productos")) || [];
-            const categorias = JSON.parse(localStorage.getItem("categorias")) || ["Remeras", "Zapatillas", "Pantalones"];
+            const productos = Utils.storage.get("productos") || [];
+            const categorias = Utils.storage.get("categorias") || ["Remeras", "Zapatillas", "Pantalones"];
             const contenedor = document.getElementById("contenedor-tienda");
             contenedor.innerHTML = "";
 
             categorias.forEach(cat => {
                 const productosCat = productos.filter(p => p.categoria === cat);
-                if (productosCat.length === 0 && productos.length > 0) return; // Ocultar si no hay productos pero hay otros
+                if (productosCat.length === 0) return;
 
                 const section = document.createElement("section");
                 section.className = "categoria";
@@ -52,36 +57,34 @@
                         <div class="producto">
                             <img src="img/${p.imagen}" alt="${p.nombre}">
                             <h3>${p.nombre}</h3>
-                            <p>Precio: Gs ${p.precio.toLocaleString()}</p>
-                            <p>Stock: ${p.stock}</p>
+                            <p class="precio">${Utils.formatCurrency(p.precio)}</p>
+                            <p class="meta">Stock: ${p.stock} | Unidades: ${p.cantidadPrendas || 1}</p>
                             <button onclick="agregar(${p.id})" ${p.stock < 1 ? "disabled" : ""}>
                                 ${p.stock < 1 ? "Sin stock" : "Agregar al carrito"}
                             </button>
                         </div>
                     `;
                 });
-
-                if (productosCat.length > 0 || productos.length === 0) {
-                    contenedor.appendChild(section);
-                }
+                contenedor.appendChild(section);
             });
         }
 
         function agregar(id) {
-            const prod = JSON.parse(localStorage.getItem("productos")).find(x => x.id === id);
+            const productos = Utils.storage.get("productos") || [];
+            const prod = productos.find(x => x.id === id);
             if (!prod || prod.stock < 1) return;
+
             const existe = carrito.find(x => x.id === id);
             existe ? existe.cantidad++ : carrito.push({...prod, cantidad: 1});
-            localStorage.setItem("carrito", JSON.stringify(carrito));
-            actualizarContador();
+
+            Utils.storage.set("carrito", carrito);
+            Utils.updateCartCounter();
             alert("✅ Agregado");
         }
 
         function actualizarContador() {
-            document.getElementById("contador").textContent = carrito.reduce((a,b) => a + b.cantidad, 0);
+            Utils.updateCartCounter();
         }
-
-        window.onload = cargarProductos;
     </script>
 </body>
 </html>
