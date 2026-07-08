@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talles Personalizados - Mally Wear</title>
+    <script src="../../js/seguridad.js"></script>
+    <link rel="stylesheet" href="../../../public/css/estilos_generales.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --bg: #f8f9fa;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .custom-size-item {
+            display: inline-flex;
+            align-items: center;
+            background: #e9ecef;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .custom-size-item button {
+            background: none;
+            border: none;
+            color: #dc3545;
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .btn-add {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-save {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1.5rem;
+        }
+        .sizes-list {
+            min-height: 50px;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Talles Personalizados</h1>
+            <a href="../editar_talles.html" class="back-btn">← Volver a Talles</a>
+        </div>
+
+        <div class="card">
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Selecciona Producto:</label>
+            <select id="select-producto" class="form-control" onchange="seleccionarProducto()">
+                <option value="">-- Selecciona un producto --</option>
+            </select>
+        </div>
+
+        <div id="talles-editor" class="card" style="display: none;">
+            <h2 id="producto-titulo">Editar talles</h2>
+            <p style="color: #666; font-size: 0.9rem;">Agrega o quita talles personalizados para este producto:</p>
+
+            <div id="lista-talles-personalizados" class="sizes-list"></div>
+
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="nuevo-talle" class="form-control" style="margin-bottom: 0;" placeholder="Ej: Único, M/L, 38-40, Especial...">
+                <button class="btn-add" onclick="agregarTallePersonalizado()">+ Agregar</button>
+            </div>
+
+            <button class="btn-save" onclick="guardarTallesPersonalizados()">💾 Guardar Talles</button>
+        </div>
+    </div>
+
+    <script src="../../../public/js/utils.js"></script>
+    <script>
+        let productosList = [];
+        let productoSeleccionado = null;
+        let tallesLocales = [];
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            await cargarProductos();
+        });
+
+        async function cargarProductos() {
+            try {
+                productosList = await Utils.api.fetch("/api/productos/");
+                const select = document.getElementById("select-producto");
+                select.innerHTML = '<option value="">-- Selecciona un producto --</option>';
+                productosList.forEach(p => {
+                    const opt = document.createElement("option");
+                    opt.value = p.id;
+                    opt.textContent = `${p.nombre} (${p.categoria})`;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                alert("Error al cargar productos: " + err.message);
+            }
+        }
+
+        async function seleccionarProducto() {
+            const id = document.getElementById("select-producto").value;
+            const editor = document.getElementById("talles-editor");
+
+            if (!id) {
+                editor.style.display = "none";
+                productoSeleccionado = null;
+                tallesLocales = [];
+                return;
+            }
+
+            productoSeleccionado = productosList.find(p => p.id == id);
+            if (productoSeleccionado) {
+                document.getElementById("producto-titulo").textContent = `Talles de: ${productoSeleccionado.nombre}`;
+
+                try {
+                    let currentTalles = productoSeleccionado.talles || [];
+                    if (typeof currentTalles === 'string') {
+                        currentTalles = JSON.parse(currentTalles);
+                    }
+                    tallesLocales = currentTalles;
+                } catch (e) {
+                    tallesLocales = [];
+                }
+
+                renderTallesPersonalizados();
+                editor.style.display = "block";
+            }
+        }
+
+        function renderTallesPersonalizados() {
+            const container = document.getElementById("lista-talles-personalizados");
+            container.innerHTML = "";
+
+            if (tallesLocales.length === 0) {
+                container.innerHTML = "<p style='color: #888; margin: 5px;'>Sin talles definidos aún. Agrega uno nuevo abajo.</p>";
+                return;
+            }
+
+            tallesLocales.forEach((t, index) => {
+                const span = document.createElement("span");
+                span.className = "custom-size-item";
+                span.innerHTML = `
+                    ${t}
+                    <button onclick="eliminarTalleLocal(${index})">&times;</button>
+                `;
+                container.appendChild(span);
+            });
+        }
+
+        function agregarTallePersonalizado() {
+            const input = document.getElementById("nuevo-talle");
+            const val = input.value.trim();
+            if (!val) return;
+
+            if (tallesLocales.includes(val)) {
+                alert("Este talle ya existe.");
+                return;
+            }
+
+            tallesLocales.push(val);
+            input.value = "";
+            renderTallesPersonalizados();
+        }
+
+        function eliminarTalleLocal(index) {
+            tallesLocales.splice(index, 1);
+            renderTallesPersonalizados();
+        }
+
+        async function guardarTallesPersonalizados() {
+            if (!productoSeleccionado) return;
+
+            try {
+                const result = await Utils.api.fetch(`/api/talles/producto/${productoSeleccionado.id}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ talles: tallesLocales })
+                });
+                if (result.success) {
+                    alert("✅ Talles personalizados guardados con éxito");
+                    await cargarProductos();
+                    document.getElementById("select-producto").value = productoSeleccionado.id;
+                    await seleccionarProducto();
+                }
+            } catch (err) {
+                alert("Error al guardar: " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

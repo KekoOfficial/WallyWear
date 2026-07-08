@@ -26,6 +26,19 @@ def crear_producto(datos):
     conn.close()
     return new_id
 
+def actualizar_producto(id, datos):
+    conn = get_db_connection()
+    conn.execute('''
+        UPDATE productos
+        SET nombre = ?, precio = ?, stock = ?, cantidad_prendas = ?, categoria = ?,
+            descripcion = ?, material = ?, variantes = ?, talles = ?
+        WHERE id = ?
+    ''', (datos['nombre'], datos['precio'], datos['stock'], datos['cantidad_prendas'], datos['categoria'],
+          datos.get('descripcion'), datos.get('material'), datos.get('variantes'), datos.get('talles'), id))
+    conn.commit()
+    conn.close()
+    return True
+
 def eliminar_producto(id):
     conn = get_db_connection()
     conn.execute('DELETE FROM productos WHERE id = ?', (id,))

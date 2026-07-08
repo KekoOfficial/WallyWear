@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talles de Calzado - Mally Wear</title>
+    <script src="../../js/seguridad.js"></script>
+    <link rel="stylesheet" href="../../../public/css/estilos_generales.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --bg: #f8f9fa;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .sizes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        .size-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            background: white;
+            transition: all 0.2s;
+        }
+        .size-box.selected {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .btn-save {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👟 Talles de Calzado</h1>
+            <a href="../editar_talles.html" class="back-btn">← Volver a Talles</a>
+        </div>
+
+        <div class="card">
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Selecciona Calzado:</label>
+            <select id="select-producto" class="form-control" onchange="seleccionarProducto()">
+                <option value="">-- Selecciona un calzado --</option>
+            </select>
+        </div>
+
+        <div id="talles-editor" class="card" style="display: none;">
+            <h2 id="producto-titulo">Editar talles</h2>
+            <p style="color: #666; font-size: 0.9rem;">Haz click en los talles disponibles para habilitarlos o deshabilitarlos:</p>
+
+            <div id="grid-calzado" class="sizes-grid"></div>
+
+            <button class="btn-save" onclick="guardarTalles()">💾 Guardar Talles</button>
+        </div>
+    </div>
+
+    <script src="../../../public/js/utils.js"></script>
+    <script src="../../js/talles.js"></script>
+    <script>
+        // Specific init for Calzado
+        window.categoryFilter = "zapatillas"; // or Calzado
+        window.availableSizes = [];
+        for(let i=35; i<=45; i++) {
+            window.availableSizes.push(i.toString());
+        }
+    </script>
+</body>
+</html>

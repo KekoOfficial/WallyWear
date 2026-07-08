@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, session
-from core.pedidos import crear_pedido, confirmar_pago, listar_pedidos
+from core.pedidos import crear_pedido, confirmar_pago, listar_pedidos, cancelar_pedido_db
 from functools import wraps
 
 pedidos_bp = Blueprint('pedidos', __name__)
@@ -27,6 +27,15 @@ def get_pedidos():
 @admin_required
 def confirmar_pedido(id):
     success, message = confirmar_pago(id)
+    if success:
+        return jsonify({"success": True, "message": message})
+    else:
+        return jsonify({"success": False, "message": message}), 400
+
+@pedidos_bp.route('/<string:id>/cancelar', methods=['POST'])
+@admin_required
+def cancelar_pedido(id):
+    success, message = cancelar_pedido_db(id)
     if success:
         return jsonify({"success": True, "message": message})
     else:

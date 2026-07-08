@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Pedidos - Mally Wear</title>
+    <script src="../js/seguridad.js"></script>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --bg: #f8f9fa;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .pedido-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 5px solid #ccc;
+        }
+        .pedido-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .pedido-card.pagado {
+            border-left-color: #28a745;
+        }
+        .pedido-card.cancelado {
+            border-left-color: #dc3545;
+        }
+        .pedido-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+            color: #007bff;
+        }
+        .pedido-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .estado-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .pendiente { background: #fff3cd; color: #856404; }
+        .pagado-badge { background: #d4edda; color: #155724; }
+        .cancelado-badge { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📑 Lista de Pedidos</h1>
+            <a href="../menu_principal.html" class="back-btn">← Panel Principal</a>
+        </div>
+        <div id="lista-pedidos-container">
+            <p>Cargando pedidos...</p>
+        </div>
+    </div>
+
+    <script src="../../public/js/utils.js"></script>
+    <script>
+        window.onload = cargarPedidos;
+
+        async function cargarPedidos() {
+            const container = document.getElementById("lista-pedidos-container");
+            try {
+                const pedidos = await Utils.api.fetch("/api/pedidos/");
+                if (!pedidos || pedidos.length === 0) {
+                    container.innerHTML = "<p>No hay pedidos registrados.</p>";
+                    return;
+                }
+                container.innerHTML = "";
+                pedidos.forEach(p => {
+                    const isPagado = p.estado === "pagado";
+                    const isCancelado = p.estado === "cancelado";
+                    const estadoClase = isPagado ? "pagado" : (isCancelado ? "cancelado" : "pendiente");
+                    const badgeClase = isPagado ? "pagado-badge" : (isCancelado ? "cancelado-badge" : "pendiente");
+
+                    const card = document.createElement("a");
+                    card.href = `detalle_pedido.html?id=${p.id}`;
+                    card.className = `pedido-card ${estadoClase}`;
+                    card.innerHTML = `
+                        <div class="pedido-info">
+                            <h3>ID: ${p.id}</h3>
+                            <p>Fecha: ${p.fecha}</p>
+                        </div>
+                        <span class="estado-badge ${badgeClase}">${p.estado}</span>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                container.innerHTML = "<p>Error al cargar la lista de pedidos.</p>";
+            }
+        }
+    </script>
+</body>
+</html>

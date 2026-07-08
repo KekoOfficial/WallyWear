@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descripción y Detalles de Producto - Mally Wear</title>
+    <script src="../js/seguridad.js"></script>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --bg: #f8f9fa;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .btn-save {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-save:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Características del Producto</h1>
+            <a href="../1_catalogo_productos.html" class="back-btn">← Volver al Catálogo</a>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="select-producto">Selecciona un Producto:</label>
+                <select id="select-producto" class="form-control" onchange="seleccionarProducto()">
+                    <option value="">-- Selecciona un producto --</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="editor-seccion" class="card" style="display: none;">
+            <h2 id="producto-titulo">Editar detalles</h2>
+            <div class="form-group">
+                <label for="descripcion-prod">Descripción Completa:</label>
+                <textarea id="descripcion-prod" class="form-control" placeholder="Escribe una descripción completa del producto..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="material-prod">Materiales y Composición:</label>
+                <input type="text" id="material-prod" class="form-control" placeholder="Ej: 100% Algodón, Cuero Genuino...">
+            </div>
+            <div class="form-group">
+                <label for="caracteristicas-prod">Características Especiales:</label>
+                <textarea id="caracteristicas-prod" class="form-control" placeholder="Ej: Costuras reforzadas, Suela antideslizante, etc."></textarea>
+            </div>
+            <button class="btn-save" onclick="guardarDetalles()">💾 Guardar Características</button>
+        </div>
+    </div>
+
+    <script src="../../public/js/utils.js"></script>
+    <script>
+        let productosList = [];
+        let productoSeleccionado = null;
+
+        window.onload = async () => {
+            await cargarProductos();
+        };
+
+        async function cargarProductos() {
+            try {
+                productosList = await Utils.api.fetch("/api/productos/");
+                const select = document.getElementById("select-producto");
+                select.innerHTML = '<option value="">-- Selecciona un producto --</option>';
+                productosList.forEach(p => {
+                    const opt = document.createElement("option");
+                    opt.value = p.id;
+                    opt.textContent = `${p.nombre} (${p.categoria})`;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                alert("Error al cargar productos: " + err.message);
+            }
+        }
+
+        function seleccionarProducto() {
+            const id = document.getElementById("select-producto").value;
+            const editor = document.getElementById("editor-seccion");
+
+            if (!id) {
+                editor.style.display = "none";
+                productoSeleccionado = null;
+                return;
+            }
+
+            productoSeleccionado = productosList.find(p => p.id == id);
+            if (productoSeleccionado) {
+                document.getElementById("producto-titulo").textContent = `Editar detalles de: ${productoSeleccionado.nombre}`;
+                document.getElementById("descripcion-prod").value = productoSeleccionado.descripcion || "";
+                document.getElementById("material-prod").value = productoSeleccionado.material || "";
+
+                // Let's store special characteristics alongside description or parse it if stored customly
+                // For simplicity, we can load a secondary field if we want or just store it.
+                // Let's check what characteristics we can parse from description or keep separate.
+                // We will just split or load a generic string.
+                document.getElementById("caracteristicas-prod").value = productoSeleccionado.codigo_interno || "";
+
+                editor.style.display = "block";
+            }
+        }
+
+        async function guardarDetalles() {
+            if (!productoSeleccionado) return;
+
+            const updatedData = {
+                nombre: productoSeleccionado.nombre,
+                precio: productoSeleccionado.precio,
+                stock: productoSeleccionado.stock,
+                cantidad_prendas: productoSeleccionado.cantidad_prendas || 1,
+                categoria: productoSeleccionado.categoria,
+                descripcion: document.getElementById("descripcion-prod").value.trim(),
+                material: document.getElementById("material-prod").value.trim(),
+                codigo_interno: document.getElementById("caracteristicas-prod").value.trim(), // custom features
+                variantes: productoSeleccionado.variantes || "[]",
+                talles: productoSeleccionado.talles || "[]"
+            };
+
+            try {
+                const response = await Utils.api.fetch(`/api/productos/${productoSeleccionado.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(updatedData)
+                });
+                if (response.success) {
+                    alert("✅ Detalles actualizados exitosamente");
+                    await cargarProductos();
+                    document.getElementById("select-producto").value = productoSeleccionado.id;
+                    seleccionarProducto();
+                }
+            } catch (err) {
+                alert("Error al guardar: " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

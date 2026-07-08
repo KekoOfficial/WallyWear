@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mally Wear - Producto</title>
+    <link rel="stylesheet" href="css/estilos_generales.css">
+    <link rel="stylesheet" href="css/estilos_tienda.css">
+    <link rel="stylesheet" href="css/estilos_responsivo.css">
+    <style>
+        .product-detail-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .product-image-section img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            object-fit: cover;
+        }
+        .product-info-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-title {
+            font-size: 2rem;
+            margin: 0 0 10px;
+            color: #1a1a1a;
+        }
+        .product-price {
+            font-size: 1.5rem;
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        .meta-tag {
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            margin-bottom: 8px;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .product-desc {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .selector-group {
+            margin-bottom: 1.2rem;
+        }
+        .selector-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #444;
+        }
+        .selector-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            background: #fff;
+        }
+        .btn-add-cart {
+            width: 100%;
+            padding: 14px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 1.5rem;
+        }
+        .btn-add-cart:hover {
+            background: #333;
+        }
+        .btn-add-cart:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mally Wear</h1>
+        <nav>
+            <a href="tienda.html">Tienda</a>
+            <a href="carrito.html">Carrito (<span id="contador">0</span>)</a>
+            <a href="politica_privacidad.html">Políticas</a>
+            <a href="../admin/0_acceso_admin.html">Acceso Admin</a>
+        </nav>
+    </header>
+
+    <main>
+        <div id="product-root">
+            <p style="text-align: center; padding: 3rem;">Cargando detalles del producto...</p>
+        </div>
+    </main>
+
+    <script src="js/utils.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        let productData = null;
+        let carrito = Utils.storage.get("carrito") || [];
+
+        window.onload = async () => {
+            Utils.updateCartCounter();
+            await cargarDetalleProducto();
+        };
+
+        async function cargarDetalleProducto() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            if (!id) {
+                document.getElementById("product-root").innerHTML = "<p style='text-align: center; padding: 3rem;'>Producto no especificado.</p>";
+                return;
+            }
+
+            try {
+                productData = await Utils.api.fetch(`/api/productos/${id}`);
+                if (!productData) {
+                    document.getElementById("product-root").innerHTML = "<p style='text-align: center; padding: 3rem;'>Producto no encontrado.</p>";
+                    return;
+                }
+
+                // Decode talles and variantes if JSON strings
+                let talles = [];
+                let variantes = [];
+                try {
+                    talles = typeof productData.talles === 'string' ? JSON.parse(productData.talles) : (productData.talles || []);
+                } catch (e) { talles = []; }
+                try {
+                    variantes = typeof productData.variantes === 'string' ? JSON.parse(productData.variantes) : (productData.variantes || []);
+                } catch (e) { variantes = []; }
+
+                let selectorTallesHTML = "";
+                if (talles && talles.length > 0) {
+                    selectorTallesHTML = `
+                        <div class="selector-group">
+                            <label for="select-talla">Selecciona Talle (Obligatorio) *</label>
+                            <select id="select-talla" class="selector-control" required>
+                                <option value="">-- Elige un talle --</option>
+                                ${talles.map(t => `<option value="${t}">${t}</option>`).join("")}
+                            </select>
+                        </div>
+                    `;
+                } else {
+                    selectorTallesHTML = `
+                        <div class="selector-group" style="display:none;">
+                            <select id="select-talla" class="selector-control"><option value="Único" selected>Único</option></select>
+                        </div>
+                    `;
+                }
+
+                let selectorVariantesHTML = "";
+                if (variantes && variantes.length > 0) {
+                    selectorVariantesHTML = `
+                        <div class="selector-group">
+                            <label for="select-variante">Selecciona Variante *</label>
+                            <select id="select-variante" class="selector-control" required>
+                                <option value="">-- Elige una variante --</option>
+                                ${variantes.map(v => `<option value="${v}">${v}</option>`).join("")}
+                            </select>
+                        </div>
+                    `;
+                } else {
+                    selectorVariantesHTML = `
+                        <div class="selector-group" style="display:none;">
+                            <select id="select-variante" class="selector-control"><option value="Única" selected>Única</option></select>
+                        </div>
+                    `;
+                }
+
+                const root = document.getElementById("product-root");
+                root.innerHTML = `
+                    <div class="product-detail-container">
+                        <div class="product-image-section">
+                            <img src="../uploads/productos/${productData.imagen}" onerror="this.src='https://via.placeholder.com/400x400?text=${productData.nombre}'" alt="${productData.nombre}">
+                        </div>
+                        <div class="product-info-section">
+                            <div>
+                                <span class="meta-tag">${productData.categoria}</span>
+                                <h1 class="product-title">${productData.nombre}</h1>
+                                <div class="product-price">${Utils.formatCurrency(productData.precio)}</div>
+
+                                <div class="section-title">Descripción</div>
+                                <p class="product-desc">${productData.descripcion || 'Sin descripción disponible.'}</p>
+
+                                <div class="section-title">Material</div>
+                                <p class="product-desc"><strong>${productData.material || 'No especificado.'}</strong></p>
+
+                                <div class="section-title">Características</div>
+                                <p class="product-desc">${productData.codigo_interno || 'Estilo clásico y duradero.'}</p>
+                            </div>
+
+                            <div>
+                                ${selectorTallesHTML}
+                                ${selectorVariantesHTML}
+
+                                <button class="btn-add-cart" id="add-to-cart-btn" onclick="agregarAlCarrito()" ${productData.stock < 1 ? "disabled" : ""}>
+                                    ${productData.stock < 1 ? "Sin Stock" : "Agregar al Carrito"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                document.getElementById("product-root").innerHTML = "<p style='text-align: center; padding: 3rem;'>Error al cargar producto.</p>";
+            }
+        }
+
+        function agregarAlCarrito() {
+            if (!productData) return;
+
+            const tSelect = document.getElementById("select-talla");
+            const vSelect = document.getElementById("select-variante");
+
+            const talle = tSelect ? tSelect.value : "Único";
+            const variante = vSelect ? vSelect.value : "Única";
+
+            // Enforce size/variant check
+            if (!talle) {
+                alert("⚠️ Debes seleccionar un talle antes de agregar al carrito.");
+                return;
+            }
+            if (!variante) {
+                alert("⚠️ Debes seleccionar una variante antes de agregar al carrito.");
+                return;
+            }
+
+            // Create unique item key combining product ID, talle and variante
+            const itemKey = `${productData.id}-${talle}-${variante}`;
+            const existe = carrito.find(x => x.itemKey === itemKey);
+
+            if (existe) {
+                if (existe.cantidad >= productData.stock) {
+                    alert(`No puedes agregar más unidades. Stock disponible: ${productData.stock}`);
+                    return;
+                }
+                existe.cantidad++;
+            } else {
+                carrito.push({
+                    id: productData.id,
+                    itemKey: itemKey,
+                    nombre: productData.nombre,
+                    precio: productData.precio,
+                    imagen: productData.imagen,
+                    categoria: productData.categoria,
+                    talle: talle,
+                    variante: variante,
+                    cantidad: 1
+                });
+            }
+
+            Utils.storage.set("carrito", carrito);
+            Utils.updateCartCounter();
+            alert("✅ ¡Producto agregado al carrito!");
+        }
+    </script>
+</body>
+</html>
