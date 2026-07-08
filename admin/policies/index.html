@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Políticas y Contenido - Wally Wear Admin</title>
+    <script src="../security/auth_check.js"></script>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .back-link { display: inline-block; margin-bottom: 1rem; color: #007bff; text-decoration: none; }
+        section { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        textarea { width: 100%; min-height: 400px; padding: 15px; border: 1px solid #ddd; border-radius: 10px; font-family: monospace; font-size: 1rem; box-sizing: border-box; }
+        .btn-save { background: #1a1a1a; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">← Volver al Panel Principal</a>
+        <h1>📝 Editor de Políticas y Contenido</h1>
+        <section>
+            <p>Escribe el contenido que aparecerá en la página de Políticas de Privacidad. Puedes usar etiquetas HTML básicas como &lt;h3&gt;, &lt;p&gt;, &lt;br&gt;.</p>
+            <textarea id="politicas-editor"></textarea>
+            <button class="btn-save" onclick="guardarPoliticas()">💾 Guardar Contenido</button>
+        </section>
+    </div>
+
+    <script src="../../public/js/utils.js"></script>
+    <script>
+        window.onload = () => {
+            const contenido = Utils.storage.get("site_policies") || `<h3>1. Información que recopilamos</h3>
+<p>Solo usamos los datos necesarios para procesar tu pedido, no compartimos información con terceros.</p>
+
+<h3>2. Métodos de pago</h3>
+<p>Aceptamos transferencias bancarias. El pedido se confirma solo al verificar el comprobante de pago.</p>
+
+<h3>3. Envíos y entregas</h3>
+<p>Una vez confirmado el pago, coordinamos la entrega dentro de las 48hs hábiles.</p>
+
+<h3>4. Cambios y devoluciones</h3>
+<p>Solo se aceptan cambios si el producto presenta fallas de fábrica en un plazo de 3 días.</p>`;
+            document.getElementById("politicas-editor").value = contenido;
+        };
+
+        function guardarPoliticas() {
+            const contenido = document.getElementById("politicas-editor").value;
+            Utils.storage.set("site_policies", contenido);
+            alert("✅ Políticas actualizadas correctamente");
+        }
+    </script>
+</body>
+</html>

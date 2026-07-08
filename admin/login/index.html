@@ -6,49 +6,125 @@
     <title>Acceso Administrador - Wally Wear</title>
     <link rel="stylesheet" href="../../public/css/estilos_generales.css">
     <style>
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         .login-container {
             max-width: 400px;
-            margin: 10vh auto;
+            width: 90%;
             background: white;
             padding: 2.5rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             text-align: center;
         }
-        .login-container h2 { margin-bottom: 1.5rem; color: #1a1a1a; }
+        .login-container h2 {
+            margin-bottom: 1.5rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
         input {
             width: 100%;
-            padding: 0.8rem;
-            margin: 0.8rem 0;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
         }
-        button { width: 100%; margin-top: 1rem; }
-        .error { color: #dc3545; margin-top: 1rem; display: none; }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background-color: #333;
+        }
+        .error {
+            color: #dc3545;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            height: 1.2rem;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2>Acceso Restringido</h2>
-        <input type="password" id="pass-master" placeholder="Contraseña Maestra">
-        <input type="password" id="pass-verif" placeholder="Contraseña de Verificación">
-        <button onclick="login()">Ingresar al Panel</button>
-        <p id="error-msg" class="error">❌ Contraseñas incorrectas</p>
+        <h2>Panel de Control</h2>
+        <div class="input-group">
+            <label>Clave Maestra</label>
+            <input type="password" id="pass-master" placeholder="••••••••">
+        </div>
+        <div class="input-group">
+            <label>Clave de Verificación</label>
+            <input type="password" id="pass-verif" placeholder="••••••••">
+        </div>
+        <button onclick="login()">Ingresar</button>
+        <p id="error-msg" class="error"></p>
     </div>
 
     <script>
         function login() {
-            const master = document.getElementById('pass-master').value;
-            const verif = document.getElementById('pass-verif').value;
+            const masterInput = document.getElementById('pass-master');
+            const verifInput = document.getElementById('pass-verif');
+            const errorMsg = document.getElementById('error-msg');
 
-            if (master === 'WallyMaster2026' && verif === 'WallyShop_777') {
+            const master = masterInput.value;
+            const verif = verifInput.value;
+
+            // Obtener claves personalizadas o usar por defecto
+            const customAuth = JSON.parse(localStorage.getItem('admin_config_auth')) || {
+                master: 'WallyMaster2026',
+                verif: 'WallyShop_777'
+            };
+
+            // Claves requeridas
+            if (master === customAuth.master && verif === customAuth.verif) {
                 sessionStorage.setItem('admin_auth', 'true');
-                window.location.href = '../1_panel_productos.html';
+                window.location.href = '../index.html';
             } else {
-                document.getElementById('error-msg').style.display = 'block';
+                // Si falla: no muestra nada (según instrucción "no muestra nada" puede significar no dar pistas,
+                // pero también dice "borra los datos ingresados")
+                masterInput.value = '';
+                verifInput.value = '';
+                errorMsg.textContent = '❌ Acceso denegado';
+                setTimeout(() => { errorMsg.textContent = ''; }, 3000);
             }
         }
+
+        // Enter para ingresar
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
     </script>
 </body>
 </html>

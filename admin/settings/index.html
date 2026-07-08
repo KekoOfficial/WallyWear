@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuraciones - Wally Wear Admin</title>
+    <script src="../security/auth_check.js"></script>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; margin-bottom: 1rem; color: #007bff; text-decoration: none; }
+        section { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 2rem; }
+        .status-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .ok { color: #28a745; font-weight: bold; }
+        .danger { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">← Volver al Panel Principal</a>
+        <h1>⚙️ Configuraciones del Sistema</h1>
+
+        <section>
+            <h2>Estado del Sistema</h2>
+            <div class="status-item">
+                <span>Almacenamiento (LocalStorage):</span>
+                <span id="storage-status" class="ok">Activo</span>
+            </div>
+            <div class="status-item">
+                <span>Integridad de Productos:</span>
+                <span id="prod-status" class="ok">Verificando...</span>
+            </div>
+            <div class="status-item">
+                <span>Integridad de Pedidos:</span>
+                <span id="ped-status" class="ok">Verificando...</span>
+            </div>
+            <button class="btn-secundario" style="margin-top: 15px;" onclick="verificarIntegridad()">🔄 Re-verificar Todo</button>
+        </section>
+
+        <section>
+            <h2>Seguridad - Cambiar Contraseñas</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px; max-width: 400px;">
+                <input type="password" id="new-master" placeholder="Nueva Clave Maestra">
+                <input type="password" id="new-verif" placeholder="Nueva Clave de Verificación">
+                <button class="btn-primary" style="background: #1a1a1a; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer;" onclick="cambiarClaves()">Actualizar Contraseñas</button>
+            </div>
+        </section>
+
+        <section>
+            <h2>Mantenimiento de Datos</h2>
+            <p>Precaución: Estas acciones son permanentes.</p>
+            <button class="btn-danger" style="background:#dc3545; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer;" onclick="limpiarCache()">Limpiar Carrito Local</button>
+            <button class="btn-danger" style="background:#dc3545; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; margin-left:10px;" onclick="resetearSistema()">⚠️ Resetear TODO el sistema</button>
+        </section>
+    </div>
+
+    <script src="../../public/js/utils.js"></script>
+    <script>
+        window.onload = verificarIntegridad;
+
+        function cambiarClaves() {
+            const master = document.getElementById('new-master').value;
+            const verif = document.getElementById('new-verif').value;
+
+            if(!master || !verif) return alert("Completa ambos campos");
+
+            if(confirm("¿Estás seguro de cambiar las claves de acceso?")) {
+                localStorage.setItem('admin_config_auth', JSON.stringify({ master, verif }));
+                alert("✅ Claves actualizadas. Deberás usarlas en el próximo inicio de sesión.");
+                document.getElementById('new-master').value = '';
+                document.getElementById('new-verif').value = '';
+            }
+        }
+
+        function verificarIntegridad() {
+            const prods = Utils.storage.get("productos") || [];
+            const peds = Utils.storage.get("pedidos") || [];
+
+            document.getElementById("prod-status").innerHTML = prods.length > 0 ? `<span class="ok">OK (${prods.length} productos)</span>` : `<span class="danger">Vacío</span>`;
+            document.getElementById("ped-status").innerHTML = peds.length > 0 ? `<span class="ok">OK (${peds.length} pedidos)</span>` : `<span class="danger">Sin pedidos</span>`;
+        }
+
+        function limpiarCache() {
+            if(confirm("¿Limpiar el carrito de compras local?")) {
+                Utils.storage.remove("carrito");
+                alert("Carrito vaciado");
+            }
+        }
+
+        function resetearSistema() {
+            if(confirm("⚠️ ATENCIÓN: Se borrarán todos los productos, pedidos y configuraciones. ¿Continuar?")) {
+                if(confirm("¿Estás ABSOLUTAMENTE seguro?")) {
+                    localStorage.clear();
+                    alert("Sistema reseteado. Se cerrará la sesión.");
+                    window.location.href = "../login/index.html";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
