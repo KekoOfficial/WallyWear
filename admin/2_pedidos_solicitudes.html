@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos - Wally Wear</title>
+    <script src="js/seguridad.js"></script>
+    <link rel="stylesheet" href="../public/css/estilos_generales.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --accent: #28a745;
+            --bg: #f4f7f6;
+        }
+        body { background-color: var(--bg); font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .back-link { display: inline-block; margin-bottom: 1rem; color: #007bff; text-decoration: none; }
+
+        .pedido-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #ccc;
+        }
+        .pedido-card.confirmado { border-left-color: var(--accent); }
+        .pedido-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .pedido-id { font-weight: bold; color: var(--primary); }
+        .pedido-fecha { color: #666; font-size: 0.9rem; }
+
+        .producto-linea { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.95rem; }
+        .total-pedido { text-align: right; font-weight: bold; font-size: 1.1rem; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
+
+        .estado-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .pendiente { background: #fff3cd; color: #856404; }
+        .confirmado-badge { background: #d4edda; color: #155724; }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        button:hover { opacity: 0.9; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="menu_principal.html" class="back-link">← Volver al Panel Principal</a>
+        <h1>📑 Gestión de Pedidos</h1>
+        <div id="pedidos-container"></div>
+    </div>
+
+    <script src="../public/js/utils.js"></script>
+    <script>
+        window.onload = cargarPedidos;
+
+        async function cargarPedidos() {
+            const container = document.getElementById("pedidos-container");
+            try {
+                const pedidos = await Utils.api.fetch("/api/pedidos/");
+
+                if (pedidos.length === 0) {
+                    container.innerHTML = "<p>No hay pedidos registrados.</p>";
+                    return;
+                }
+
+                container.innerHTML = "";
+                pedidos.forEach(pedido => {
+                    const isConfirmado = pedido.estado === "pagado";
+                    const card = document.createElement("div");
+                    card.className = `pedido-card ${isConfirmado ? 'confirmado' : ''}`;
+
+                    let productosHTML = "";
+                    const productos_lista = JSON.parse(pedido.productos);
+                    productos_lista.forEach(p => {
+                        productosHTML += `
+                            <div class="producto-linea">
+                                <span>${p.nombre} x${p.cantidad}</span>
+                                <span>${Utils.formatCurrency(p.precio * p.cantidad)}</span>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="pedido-header">
+                            <div>
+                                <span class="pedido-id">${pedido.id}</span><br>
+                                <span class="pedido-fecha">${pedido.fecha}</span>
+                            </div>
+                            <span class="estado-badge ${isConfirmado ? 'confirmado-badge' : 'pendiente'}">
+                                ${pedido.estado}
+                            </span>
+                        </div>
+                        <div class="pedido-cuerpo">
+                            ${productosHTML}
+                            <div class="total-pedido">Total: ${Utils.formatCurrency(pedido.total)}</div>
+                        </div>
+                        ${!isConfirmado ?
+                            `<button onclick="confirmarPedido('${pedido.id}')">✅ Confirmar pago y procesar pedido</button>` :
+                            `<button disabled>Pedido Procesado</button>`
+                        }
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                container.innerHTML = "<p>Error al cargar pedidos.</p>";
+            }
+        }
+
+        async function confirmarPedido(id) {
+            if (!confirm("¿Confirmar pago y descontar stock?")) return;
+
+            try {
+                const response = await Utils.api.fetch(`/api/pedidos/${id}/confirmar`, { method: 'POST' });
+                alert("✅ " + response.message);
+                cargarPedidos();
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

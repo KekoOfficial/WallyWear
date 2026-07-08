@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso Administrador - Wally Wear</title>
-    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <link rel="stylesheet" href="../public/css/estilos_generales.css">
     <style>
         body {
             background-color: #f4f7f6;
@@ -90,8 +90,9 @@
         <p id="error-msg" class="error"></p>
     </div>
 
+    <script src="../public/js/utils.js"></script>
     <script>
-        function login() {
+        async function login() {
             const masterInput = document.getElementById('pass-master');
             const verifInput = document.getElementById('pass-verif');
             const errorMsg = document.getElementById('error-msg');
@@ -99,19 +100,16 @@
             const master = masterInput.value;
             const verif = verifInput.value;
 
-            // Obtener claves personalizadas o usar por defecto
-            const customAuth = JSON.parse(localStorage.getItem('admin_config_auth')) || {
-                master: 'WallyMaster2026',
-                verif: 'WallyShop_777'
-            };
+            try {
+                const response = await Utils.api.fetch('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ master, verif })
+                });
 
-            // Claves requeridas
-            if (master === customAuth.master && verif === customAuth.verif) {
-                sessionStorage.setItem('admin_auth', 'true');
-                window.location.href = '../index.html';
-            } else {
-                // Si falla: no muestra nada (según instrucción "no muestra nada" puede significar no dar pistas,
-                // pero también dice "borra los datos ingresados")
+                if (response.success) {
+                    window.location.href = 'menu_principal.html';
+                }
+            } catch (err) {
                 masterInput.value = '';
                 verifInput.value = '';
                 errorMsg.textContent = '❌ Acceso denegado';
@@ -119,7 +117,6 @@
             }
         }
 
-        // Enter para ingresar
         document.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 login();

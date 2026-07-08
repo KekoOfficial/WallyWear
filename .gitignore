@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+database/wallywear.db
+uploads/*
+!uploads/.gitkeep
+backups/*
+!backups/.gitkeep
+database/logs/*.log
