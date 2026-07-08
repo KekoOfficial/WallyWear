@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wally Wear - Carrito</title>
+    <title>Carrito de Compras - Wally Wear</title>
     <link rel="stylesheet" href="css/estilos_generales.css">
     <link rel="stylesheet" href="css/estilos_carrito.css">
     <link rel="stylesheet" href="css/estilos_responsivo.css">
@@ -22,81 +22,118 @@
         <h2>Tu Carrito de Compras</h2>
         <div id="lista-carrito"></div>
         <div id="total-final"></div>
-        <button id="btn-pedir" onclick="generarPedido()">Generar Pedido</button>
+        <button id="btn-pedir" onclick="generarPedido()" style="width: 100%; margin-top: 2rem; display: none;">Generar Pedido</button>
         <div id="resultado-pedido"></div>
     </main>
 
+    <script src="js/utils.js"></script>
+    <script src="js/footer.js"></script>
     <script>
-        let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-        actualizarContador();
+        let carrito = Utils.getLocalStorage("carrito");
+        Utils.updateCartCounter();
         mostrarCarrito();
 
         function mostrarCarrito() {
             const contenedor = document.getElementById("lista-carrito");
+            const btnPedir = document.getElementById("btn-pedir");
             contenedor.innerHTML = "";
             let total = 0;
 
             if (carrito.length === 0) {
-                contenedor.innerHTML = "<p>Tu carrito está vacío</p>";
+                contenedor.innerHTML = "<p style='text-align:center; margin-top: 2rem;'>Tu carrito está vacío</p>";
+                document.getElementById("total-final").innerHTML = "";
+                btnPedir.style.display = "none";
                 return;
             }
 
+            btnPedir.style.display = "block";
             carrito.forEach((item, index) => {
                 const subtotal = item.precio * item.cantidad;
                 total += subtotal;
                 contenedor.innerHTML += `
-                    <div class="item-carrito">
-                        <h4>${item.nombre}</h4>
-                        <p>Precio: Gs ${item.precio.toLocaleString()}</p>
-                        <p>Cantidad: ${item.cantidad}</p>
-                        <p>Subtotal: Gs ${subtotal.toLocaleString()}</p>
-                        <button onclick="quitarDelCarrito(${index})">Quitar uno</button>
+                    <div class="item-carrito" style="background:white; padding:1rem; border-radius:10px; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <div>
+                            <h4>${item.nombre}</h4>
+                            <p>${Utils.formatCurrency(item.precio)} x ${item.cantidad}</p>
+                            <p><strong>Subtotal: ${Utils.formatCurrency(subtotal)}</strong></p>
+                        </div>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="cambiarCantidad(${index}, -1)" style="padding: 0.5rem 0.8rem;">-</button>
+                            <button onclick="cambiarCantidad(${index}, 1)" style="padding: 0.5rem 0.8rem;">+</button>
+                            <button onclick="eliminarDelCarrito(${index})" style="background:#dc3545; padding: 0.5rem 0.8rem;">🗑️</button>
+                        </div>
                     </div>
                 `;
             });
 
-            document.getElementById("total-final").innerHTML = `<h3>Total a pagar: Gs ${total.toLocaleString()}</h3>`;
+            document.getElementById("total-final").innerHTML = `
+                <div style="text-align: right; margin-top: 1rem; border-top: 2px solid #ddd; padding-top: 1rem;">
+                    <h3>Total a pagar: ${Utils.formatCurrency(total)}</h3>
+                </div>
+            `;
         }
 
-        function quitarDelCarrito(index) {
-            if (carrito[index].cantidad > 1) carrito[index].cantidad--;
-            else carrito.splice(index, 1);
-            localStorage.setItem("carrito", JSON.stringify(carrito));
+        function cambiarCantidad(index, delta) {
+            const productos = Utils.getLocalStorage("productos");
+            const prodStock = productos.find(p => p.id === carrito[index].id);
+
+            if (delta > 0) {
+                if (carrito[index].cantidad < prodStock.stock) {
+                    carrito[index].cantidad++;
+                } else {
+                    alert("No hay más stock disponible");
+                }
+            } else {
+                if (carrito[index].cantidad > 1) {
+                    carrito[index].cantidad--;
+                } else {
+                    eliminarDelCarrito(index);
+                    return;
+                }
+            }
+
+            Utils.setLocalStorage("carrito", carrito);
             mostrarCarrito();
-            actualizarContador();
+            Utils.updateCartCounter();
         }
 
-        function actualizarContador() {
-            document.getElementById("contador-carrito").textContent = carrito.reduce((a, b) => a + b.cantidad, 0);
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            Utils.setLocalStorage("carrito", carrito);
+            mostrarCarrito();
+            Utils.updateCartCounter();
         }
 
         function generarPedido() {
             if (carrito.length === 0) return alert("El carrito está vacío");
             
             const idPedido = "PED-" + Date.now();
-            const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+            const pedidos = Utils.getLocalStorage("pedidos");
             
             pedidos.push({
                 id: idPedido,
                 fecha: new Date().toLocaleString(),
-                productos: carrito,
+                productos: JSON.parse(JSON.stringify(carrito)),
                 total: carrito.reduce((a, b) => a + (b.precio * b.cantidad), 0),
                 estado: "Pendiente de pago"
             });
 
-            localStorage.setItem("pedidos", JSON.stringify(pedidos));
+            Utils.setLocalStorage("pedidos", pedidos);
             localStorage.removeItem("carrito");
             carrito = [];
+
             mostrarCarrito();
-            actualizarContador();
+            Utils.updateCartCounter();
 
             document.getElementById("resultado-pedido").innerHTML = `
-                <div class="aviso">
-                    ✅ Pedido creado con éxito<br>
-                    <strong>Tu ID de pedido: ${idPedido}</strong><br>
-                    Envía la captura de transferencia y este ID por WhatsApp para confirmar tu compra.
+                <div style="background: #d4edda; color: #155724; padding: 2rem; border-radius: 15px; margin-top: 2rem; text-align: center; border: 1px solid #c3e6cb;">
+                    <h2 style="margin-bottom: 1rem;">✅ ¡Pedido Realizado!</h2>
+                    <p>Tu ID de pedido es: <strong>${idPedido}</strong></p>
+                    <p style="margin: 1rem 0;">Por favor, envía el comprobante de transferencia junto con tu ID de pedido a nuestro WhatsApp para procesar tu compra.</p>
+                    <button onclick="window.location.href='1_tienda.html'">Volver a la Tienda</button>
                 </div>
             `;
+            window.scrollTo(0, document.body.scrollHeight);
         }
     </script>
 </body>

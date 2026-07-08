@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Políticas - Wally Wear</title>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <script src="../security/auth_check.js"></script>
+    <style>
+        .admin-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            margin-bottom: 1rem;
+            resize: vertical;
+        }
+        .nav-back { margin-bottom: 1rem; display: inline-block; text-decoration: none; color: #1a1a1a; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Políticas del Sitio</h1>
+        <a href="../index.html" class="nav-back">← Volver al Panel</a>
+    </header>
+
+    <main>
+        <section class="admin-section">
+            <p style="margin-bottom: 1rem;">Escribe aquí el contenido de Políticas y Privacidad (puedes usar HTML básico).</p>
+            <textarea id="politicas-content" placeholder="Escribe aquí las políticas..."></textarea>
+            <button onclick="guardarPoliticas()" style="width: 100%; padding: 1rem;">Actualizar Políticas Públicas</button>
+        </section>
+    </main>
+
+    <script>
+        function cargarPoliticas() {
+            const defaultText = `<h3>1. Información que recopilamos</h3>
+<p>Solo usamos los datos necesarios para procesar tu pedido, no compartimos información con terceros.</p>
+
+<h3>2. Métodos de pago</h3>
+<p>Aceptamos transferencias bancarias. El pedido se confirma solo al verificar el comprobante de pago.</p>
+
+<h3>3. Envíos y entregas</h3>
+<p>Una vez confirmado el pago, coordinamos la entrega dentro de las 48hs hábiles.</p>
+
+<h3>4. Cambios y devoluciones</h3>
+<p>Solo se aceptan cambios si el producto presenta fallas de fábrica en un plazo de 3 días.</p>`;
+
+            const contenido = localStorage.getItem('site_policies') || defaultText;
+            document.getElementById('politicas-content').value = contenido;
+        }
+
+        function guardarPoliticas() {
+            const contenido = document.getElementById('politicas-content').value;
+            localStorage.setItem('site_policies', contenido);
+            alert("✅ Políticas actualizadas. Se reflejarán en la página pública.");
+        }
+
+        window.onload = cargarPoliticas;
+    </script>
+</body>
+</html>

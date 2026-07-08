@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wally Wear - Tienda</title>
+    <title>Wally Wear - Tienda Oficial</title>
     <link rel="stylesheet" href="css/estilos_generales.css">
     <link rel="stylesheet" href="css/estilos_tienda.css">
     <link rel="stylesheet" href="css/estilos_responsivo.css">
 </head>
 <body>
     <header>
-        <h1>Mally Wear</h1>
+        <h1>Wally Wear</h1>
         <nav>
             <a href="1_tienda.html">Tienda</a>
             <a href="2_carrito.html">Carrito (<span id="contador">0</span>)</a>
             <a href="3_politica_privacidad.html">Políticas</a>
-            <a href="../admin/1_panel_productos.html">Acceso Admin</a>
+            <a href="../admin/index.html">Acceso Admin</a>
         </nav>
     </header>
 
@@ -23,19 +23,31 @@
         <!-- Las categorías y productos se cargarán dinámicamente -->
     </main>
 
+    <script src="js/utils.js"></script>
+    <script src="js/footer.js"></script>
     <script>
-        let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-        actualizarContador();
+        let carrito = Utils.getLocalStorage("carrito");
+        Utils.updateCartCounter();
 
         function cargarProductos() {
-            const productos = JSON.parse(localStorage.getItem("productos")) || [];
-            const categorias = JSON.parse(localStorage.getItem("categorias")) || ["Remeras", "Zapatillas", "Pantalones"];
+            const productos = Utils.getLocalStorage("productos");
+            const categorias = Utils.getLocalStorage("categorias", ["Remeras", "Zapatillas", "Pantalones"]);
             const contenedor = document.getElementById("contenedor-tienda");
             contenedor.innerHTML = "";
 
+            if (productos.length === 0) {
+                contenedor.innerHTML = `
+                    <div style="text-align: center; margin-top: 5rem;">
+                        <h2>¡Próximamente!</h2>
+                        <p>Estamos preparando nuestra nueva colección. Vuelve pronto.</p>
+                    </div>
+                `;
+                return;
+            }
+
             categorias.forEach(cat => {
                 const productosCat = productos.filter(p => p.categoria === cat);
-                if (productosCat.length === 0 && productos.length > 0) return; // Ocultar si no hay productos pero hay otros
+                if (productosCat.length === 0) return;
 
                 const section = document.createElement("section");
                 section.className = "categoria";
@@ -50,10 +62,10 @@
                 productosCat.forEach(p => {
                     lista.innerHTML += `
                         <div class="producto">
-                            <img src="img/${p.imagen}" alt="${p.nombre}">
+                            <img src="img/${p.imagen}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/200?text=Sin+Imagen'">
                             <h3>${p.nombre}</h3>
-                            <p>Precio: Gs ${p.precio.toLocaleString()}</p>
-                            <p>Stock: ${p.stock}</p>
+                            <p>Precio: ${Utils.formatCurrency(p.precio)}</p>
+                            <p>Stock: ${p.stock > 0 ? p.stock : '<span style="color:red">Agotado</span>'}</p>
                             <button onclick="agregar(${p.id})" ${p.stock < 1 ? "disabled" : ""}>
                                 ${p.stock < 1 ? "Sin stock" : "Agregar al carrito"}
                             </button>
@@ -61,24 +73,30 @@
                     `;
                 });
 
-                if (productosCat.length > 0 || productos.length === 0) {
-                    contenedor.appendChild(section);
-                }
+                contenedor.appendChild(section);
             });
         }
 
         function agregar(id) {
-            const prod = JSON.parse(localStorage.getItem("productos")).find(x => x.id === id);
-            if (!prod || prod.stock < 1) return;
-            const existe = carrito.find(x => x.id === id);
-            existe ? existe.cantidad++ : carrito.push({...prod, cantidad: 1});
-            localStorage.setItem("carrito", JSON.stringify(carrito));
-            actualizarContador();
-            alert("✅ Agregado");
-        }
+            const productos = Utils.getLocalStorage("productos");
+            const prod = productos.find(x => x.id === id);
 
-        function actualizarContador() {
-            document.getElementById("contador").textContent = carrito.reduce((a,b) => a + b.cantidad, 0);
+            if (!prod || prod.stock < 1) return;
+
+            const existe = carrito.find(x => x.id === id);
+            if (existe) {
+                if (existe.cantidad < prod.stock) {
+                    existe.cantidad++;
+                } else {
+                    return alert("Lo sentimos, no hay más stock disponible de este producto.");
+                }
+            } else {
+                carrito.push({...prod, cantidad: 1});
+            }
+
+            Utils.setLocalStorage("carrito", carrito);
+            Utils.updateCartCounter();
+            alert("✅ Agregado al carrito");
         }
 
         window.onload = cargarProductos;

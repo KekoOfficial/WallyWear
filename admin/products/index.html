@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos - Wally Wear</title>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <script src="../security/auth_check.js"></script>
+    <style>
+        .admin-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.3rem; font-weight: bold; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .product-item {
+            border: 1px solid #eee;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .product-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+        .btn-delete { background: #dc3545; padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        .nav-back { margin-bottom: 1rem; display: inline-block; text-decoration: none; color: #1a1a1a; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Gestión de Catálogo</h1>
+        <a href="../index.html" class="nav-back">← Volver al Panel</a>
+    </header>
+
+    <main>
+        <section class="admin-section">
+            <h3>📂 Categorías</h3>
+            <div class="form-group" style="display: flex; gap: 10px; margin-top: 1rem;">
+                <input type="text" id="nueva-cat" placeholder="Nueva categoría (ej: Abrigos)">
+                <button onclick="crearCategoria()">Añadir</button>
+            </div>
+            <div id="lista-categorias" style="margin-top: 1rem;"></div>
+        </section>
+
+        <section class="admin-section">
+            <h3>➕ Agregar Producto</h3>
+            <div class="form-group">
+                <label>Nombre del Producto:</label>
+                <input type="text" id="nombre" placeholder="Ej: Remera Oversize Black">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>Precio (Gs):</label>
+                    <input type="number" id="precio" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Stock Inicial:</label>
+                    <input type="number" id="stock" placeholder="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Categoría:</label>
+                <select id="categoria-select"></select>
+            </div>
+            <div class="form-group">
+                <label>Imagen del Producto:</label>
+                <input type="file" id="imagen-file" accept="image/*" onchange="previewImage(this)">
+                <p id="filename-preview" style="font-size: 0.8rem; color: #666; margin-top: 5px;"></p>
+            </div>
+            <button onclick="guardarProducto()" style="width: 100%; padding: 1rem;">Guardar Producto</button>
+        </section>
+
+        <section class="admin-section">
+            <h3>📦 Productos en Inventario</h3>
+            <div id="lista-productos" class="product-list" style="margin-top: 1.5rem;"></div>
+        </section>
+    </main>
+
+    <script>
+        let selectedFilename = "";
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                selectedFilename = input.files[0].name;
+                document.getElementById('filename-preview').textContent = "Archivo seleccionado: " + selectedFilename;
+            }
+        }
+
+        function cargarCategorias() {
+            const cats = JSON.parse(localStorage.getItem("categorias")) || ["Remeras", "Zapatillas", "Pantalones"];
+            const select = document.getElementById("categoria-select");
+            const lista = document.getElementById("lista-categorias");
+
+            select.innerHTML = "";
+            lista.innerHTML = "";
+
+            cats.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c;
+                opt.textContent = c;
+                select.appendChild(opt);
+
+                const span = document.createElement("span");
+                span.style = "background: #eee; padding: 5px 10px; border-radius: 15px; margin-right: 5px; display: inline-block; font-size: 0.8rem; margin-bottom: 5px;";
+                span.textContent = c;
+                lista.appendChild(span);
+            });
+        }
+
+        function crearCategoria() {
+            const input = document.getElementById("nueva-cat");
+            const nombre = input.value.trim();
+            if (!nombre) return;
+
+            let cats = JSON.parse(localStorage.getItem("categorias")) || ["Remeras", "Zapatillas", "Pantalones"];
+            if (cats.includes(nombre)) return alert("La categoría ya existe");
+
+            cats.push(nombre);
+            localStorage.setItem("categorias", JSON.stringify(cats));
+            input.value = "";
+            cargarCategorias();
+        }
+
+        function guardarProducto() {
+            const nombre = document.getElementById("nombre").value.trim();
+            const precio = parseInt(document.getElementById("precio").value);
+            const stock = parseInt(document.getElementById("stock").value);
+            const categoria = document.getElementById("categoria-select").value;
+
+            if (!nombre || isNaN(precio) || isNaN(stock) || !selectedFilename) {
+                return alert("Por favor complete todos los campos y seleccione una imagen.");
+            }
+
+            const productos = JSON.parse(localStorage.getItem("productos")) || [];
+            const nuevo = {
+                id: Date.now(),
+                nombre, precio, stock, categoria, imagen: selectedFilename
+            };
+
+            productos.push(nuevo);
+            localStorage.setItem("productos", JSON.stringify(productos));
+
+            // Limpiar formulario
+            document.getElementById("nombre").value = "";
+            document.getElementById("precio").value = "";
+            document.getElementById("stock").value = "";
+            document.getElementById("imagen-file").value = "";
+            document.getElementById("filename-preview").textContent = "";
+            selectedFilename = "";
+
+            cargarProductos();
+            alert("✅ Producto guardado correctamente");
+        }
+
+        function cargarProductos() {
+            const contenedor = document.getElementById("lista-productos");
+            const productos = JSON.parse(localStorage.getItem("productos")) || [];
+            contenedor.innerHTML = "";
+
+            if (productos.length === 0) {
+                contenedor.innerHTML = "<p>No hay productos en el catálogo.</p>";
+                return;
+            }
+
+            productos.forEach(p => {
+                contenedor.innerHTML += `
+                    <div class="product-item">
+                        <img src="../../public/img/${p.imagen}" onerror="this.src='https://via.placeholder.com/100?text=Sin+Imagen'">
+                        <h4>${p.nombre}</h4>
+                        <p>${p.categoria}</p>
+                        <p><strong>Gs ${p.precio.toLocaleString()}</strong></p>
+                        <p>Stock: ${p.stock}</p>
+                        <button class="btn-delete" onclick="eliminarProducto(${p.id})">Eliminar</button>
+                    </div>
+                `;
+            });
+        }
+
+        function eliminarProducto(id) {
+            if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
+            let productos = JSON.parse(localStorage.getItem("productos")) || [];
+            productos = productos.filter(p => p.id !== id);
+            localStorage.setItem("productos", JSON.stringify(productos));
+            cargarProductos();
+        }
+
+        window.onload = () => {
+            cargarCategorias();
+            cargarProductos();
+        };
+    </script>
+</body>
+</html>

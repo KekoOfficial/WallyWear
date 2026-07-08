@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuraciones - Wally Wear</title>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <script src="../security/auth_check.js"></script>
+    <style>
+        .admin-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        .status-ok { color: #28a745; font-weight: bold; }
+        .nav-back { margin-bottom: 1rem; display: inline-block; text-decoration: none; color: #1a1a1a; font-weight: bold; }
+        .danger-zone { border: 1px solid #dc3545; padding: 1.5rem; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Configuración General</h1>
+        <a href="../index.html" class="nav-back">← Volver al Panel</a>
+    </header>
+
+    <main>
+        <section class="admin-section">
+            <h3>Estado del Sistema</h3>
+            <ul style="margin-top: 1rem; list-style: none;">
+                <li>✅ Base de Datos (LocalStorage): <span class="status-ok">OPERATIVO</span></li>
+                <li>✅ Seguridad de Acceso: <span class="status-ok">ACTIVA</span></li>
+                <li>✅ Servidor: <span class="status-ok">ONLINE</span></li>
+            </ul>
+        </section>
+
+        <section class="admin-section">
+            <h3>Información del Sistema</h3>
+            <p style="margin-top: 1rem;">
+                <strong>Versión:</strong> 2.0.0 (Seguridad Reforzada)<br>
+                <strong>Entorno:</strong> Local / Termux<br>
+                <strong>Última sincronización:</strong> <span id="sync-time"></span>
+            </p>
+        </section>
+
+        <section class="admin-section danger-zone">
+            <h3 style="color: #dc3545;">Zona de Peligro</h3>
+            <p style="margin: 1rem 0; font-size: 0.9rem;">Estas acciones no se pueden deshacer.</p>
+            <button onclick="limpiarTodo()" style="background: #dc3545;">Borrar TODOS los datos (Reset)</button>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('sync-time').textContent = new Date().toLocaleString();
+
+        function limpiarTodo() {
+            if (confirm("⚠️ ¿ESTÁS SEGURO? Se borrarán todos los productos, pedidos y configuraciones. Esta acción es irreversible.")) {
+                if (confirm("¿Última confirmación?")) {
+                    localStorage.clear();
+                    alert("Sistema reseteado. Se cerrará la sesión.");
+                    sessionStorage.clear();
+                    window.location.href = '../login/index.html';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

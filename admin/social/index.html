@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Redes Sociales - Wally Wear</title>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <script src="../security/auth_check.js"></script>
+    <style>
+        .admin-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .nav-back { margin-bottom: 1rem; display: inline-block; text-decoration: none; color: #1a1a1a; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Redes Sociales</h1>
+        <a href="../index.html" class="nav-back">← Volver al Panel</a>
+    </header>
+
+    <main>
+        <section class="admin-section">
+            <p style="margin-bottom: 2rem;">Los enlaces que guardes aquí se actualizarán automáticamente en el pie de página de toda la tienda.</p>
+
+            <div class="form-group">
+                <label>WhatsApp (Link directo):</label>
+                <input type="text" id="whatsapp" placeholder="https://wa.me/595981123456">
+            </div>
+
+            <div class="form-group">
+                <label>Instagram (URL):</label>
+                <input type="text" id="instagram" placeholder="https://instagram.com/tu_usuario">
+            </div>
+
+            <div class="form-group">
+                <label>Facebook (URL):</label>
+                <input type="text" id="facebook" placeholder="https://facebook.com/tu_pagina">
+            </div>
+
+            <div class="form-group">
+                <label>TikTok (URL):</label>
+                <input type="text" id="tiktok" placeholder="https://tiktok.com/@tu_usuario">
+            </div>
+
+            <button onclick="guardarRedes()" style="width: 100%; padding: 1rem;">Guardar Cambios</button>
+        </section>
+    </main>
+
+    <script>
+        function cargarRedes() {
+            const redes = JSON.parse(localStorage.getItem('social_links')) || {
+                whatsapp: '',
+                instagram: '',
+                facebook: '',
+                tiktok: ''
+            };
+
+            document.getElementById('whatsapp').value = redes.whatsapp || '';
+            document.getElementById('instagram').value = redes.instagram || '';
+            document.getElementById('facebook').value = redes.facebook || '';
+            document.getElementById('tiktok').value = redes.tiktok || '';
+        }
+
+        function guardarRedes() {
+            const redes = {
+                whatsapp: document.getElementById('whatsapp').value.trim(),
+                instagram: document.getElementById('instagram').value.trim(),
+                facebook: document.getElementById('facebook').value.trim(),
+                tiktok: document.getElementById('tiktok').value.trim()
+            };
+
+            localStorage.setItem('social_links', JSON.stringify(redes));
+            alert("✅ Redes sociales actualizadas correctamente.");
+        }
+
+        window.onload = cargarRedes;
+    </script>
+</body>
+</html>

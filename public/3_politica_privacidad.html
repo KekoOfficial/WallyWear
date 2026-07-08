@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wally Wear - Políticas</title>
+    <title>Políticas y Privacidad - Wally Wear</title>
     <link rel="stylesheet" href="css/estilos_generales.css">
     <link rel="stylesheet" href="css/estilos_politica.css">
     <link rel="stylesheet" href="css/estilos_responsivo.css">
@@ -20,19 +20,31 @@
 
     <main>
         <h2>Política de Privacidad y Condiciones</h2>
-        <div class="texto-politica">
-            <h3>1. Información que recopilamos</h3>
-            <p>Solo usamos los datos necesarios para procesar tu pedido, no compartimos información con terceros.</p>
-
-            <h3>2. Métodos de pago</h3>
-            <p>Aceptamos transferencias bancarias. El pedido se confirma solo al verificar el comprobante de pago.</p>
-
-            <h3>3. Envíos y entregas</h3>
-            <p>Una vez confirmado el pago, coordinamos la entrega dentro de las 48hs hábiles.</p>
-
-            <h3>4. Cambios y devoluciones</h3>
-            <p>Solo se aceptan cambios si el producto presenta fallas de fábrica en un plazo de 3 días.</p>
+        <div id="politicas-dinamicas" class="texto-politica" style="background: white; padding: 2rem; border-radius: 15px; margin-top: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <!-- El contenido se cargará desde localStorage -->
         </div>
     </main>
+
+    <script src="js/footer.js"></script>
+    <script>
+        function cargarPoliticasPublicas() {
+            const defaultText = `<h3>1. Información que recopilamos</h3>
+<p>Solo usamos los datos necesarios para procesar tu pedido, no compartimos información con terceros.</p>
+
+<h3>2. Métodos de pago</h3>
+<p>Aceptamos transferencias bancarias. El pedido se confirma solo al verificar el comprobante de pago.</p>
+
+<h3>3. Envíos y entregas</h3>
+<p>Una vez confirmado el pago, coordinamos la entrega dentro de las 48hs hábiles.</p>
+
+<h3>4. Cambios y devoluciones</h3>
+<p>Solo se aceptan cambios si el producto presenta fallas de fábrica en un plazo de 3 días.</p>`;
+
+            const contenido = localStorage.getItem('site_policies') || defaultText;
+            document.getElementById('politicas-dinamicas').innerHTML = contenido;
+        }
+
+        window.onload = cargarPoliticasPublicas;
+    </script>
 </body>
 </html>

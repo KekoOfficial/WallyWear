@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Wally Wear</title>
+    <link rel="stylesheet" href="../public/css/estilos_generales.css">
+    <script src="security/auth_check.js"></script>
+    <style>
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .admin-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .admin-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+        .admin-card h3 {
+            margin-bottom: 0.5rem;
+        }
+        .admin-card p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Panel de Administración</h1>
+        <p>Bienvenido al sistema de gestión de Wally Wear</p>
+        <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+    </header>
+
+    <main>
+        <div class="admin-grid">
+            <a href="products/index.html" class="admin-card">
+                <h3>📦 Catálogo y Productos</h3>
+                <p>Gestionar stock, categorías y precios</p>
+            </a>
+            <a href="orders/index.html" class="admin-card">
+                <h3>📝 Pedidos y Solicitudes</h3>
+                <p>Ver pedidos y confirmar pagos</p>
+            </a>
+            <a href="social/index.html" class="admin-card">
+                <h3>📱 Redes Sociales</h3>
+                <p>Configurar enlaces de contacto</p>
+            </a>
+            <a href="policies/index.html" class="admin-card">
+                <h3>📄 Políticas y Textos</h3>
+                <p>Editar avisos legales y privacidad</p>
+            </a>
+            <a href="settings/index.html" class="admin-card">
+                <h3>⚙️ Configuraciones</h3>
+                <p>Estado del sistema y seguridad</p>
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="../public/1_tienda.html" style="color: #1a1a1a; font-weight: bold; text-decoration: none;">← Volver a la Tienda Pública</a>
+        </div>
+    </main>
+
+    <script>
+        function logout() {
+            sessionStorage.removeItem('admin_auth');
+            window.location.href = 'login/index.html';
+        }
+    </script>
+</body>
+</html>

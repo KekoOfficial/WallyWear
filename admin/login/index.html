@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrativo - Wally Wear</title>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 5rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .login-container h2 { margin-bottom: 2rem; color: #1a1a1a; }
+        .input-group { margin-bottom: 1.5rem; text-align: left; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .btn-login { width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem; }
+        .error-msg { color: #dc3545; margin-top: 1rem; display: none; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>🔒 Acceso Admin</h2>
+        <div class="input-group">
+            <label>Clave Maestra:</label>
+            <input type="password" id="master-pass" placeholder="Ingrese Clave Maestra">
+        </div>
+        <div class="input-group">
+            <label>Clave de Verificación:</label>
+            <input type="password" id="verify-pass" placeholder="Ingrese Clave de Verificación">
+        </div>
+        <button class="btn-login" onclick="login()">Ingresar al Sistema</button>
+        <p id="error" class="error-msg">❌ Las credenciales son incorrectas</p>
+    </div>
+
+    <script>
+        function login() {
+            const master = document.getElementById('master-pass').value;
+            const verify = document.getElementById('verify-pass').value;
+            const error = document.getElementById('error');
+
+            // Credenciales requeridas
+            const MASTER_KEY = "WallyMaster2026";
+            const VERIFY_KEY = "WallyShop_777";
+
+            if (master === MASTER_KEY && verify === VERIFY_KEY) {
+                sessionStorage.setItem('admin_auth', 'true');
+                window.location.href = '../index.html';
+            } else {
+                error.style.display = 'block';
+                // Limpiar campos
+                document.getElementById('master-pass').value = '';
+                document.getElementById('verify-pass').value = '';
+            }
+        }
+
+        // Permitir Enter para loguear
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos - Wally Wear</title>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <script src="../security/auth_check.js"></script>
+    <style>
+        .order-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid #ffc107;
+        }
+        .order-card.confirmed { border-left-color: #28a745; }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
+        .order-details { margin-bottom: 1rem; }
+        .product-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.3rem; }
+        .order-total { text-align: right; font-weight: bold; font-size: 1.1rem; margin-top: 0.5rem; }
+        .status-badge { padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d4edda; color: #155724; }
+        .nav-back { margin-bottom: 1rem; display: inline-block; text-decoration: none; color: #1a1a1a; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Gestión de Pedidos</h1>
+        <a href="../index.html" class="nav-back">← Volver al Panel</a>
+    </header>
+
+    <main>
+        <div id="lista-pedidos"></div>
+    </main>
+
+    <script>
+        function cargarPedidos() {
+            const contenedor = document.getElementById("lista-pedidos");
+            const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+            contenedor.innerHTML = "";
+
+            if (pedidos.length === 0) {
+                contenedor.innerHTML = "<p style='text-align:center;'>No hay pedidos registrados.</p>";
+                return;
+            }
+
+            // Mostrar los más recientes primero
+            pedidos.slice().reverse().forEach(p => {
+                const isConfirmed = p.estado.includes("confirmado") || p.estado.includes("Procesado");
+                const card = document.createElement("div");
+                card.className = `order-card ${isConfirmed ? 'confirmed' : ''}`;
+
+                let productosHTML = "";
+                p.productos.forEach(prod => {
+                    productosHTML += `
+                        <div class="product-line">
+                            <span>${prod.nombre} x${prod.cantidad}</span>
+                            <span>Gs ${(prod.precio * prod.cantidad).toLocaleString()}</span>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="order-header">
+                        <div>
+                            <strong>ID: ${p.id}</strong><br>
+                            <small>${p.fecha}</small>
+                        </div>
+                        <span class="status-badge ${isConfirmed ? 'status-confirmed' : 'status-pending'}">${p.estado}</span>
+                    </div>
+                    <div class="order-details">
+                        ${productosHTML}
+                    </div>
+                    <div class="order-total">
+                        Total: Gs ${p.total.toLocaleString()}
+                    </div>
+                    ${!isConfirmed ? `
+                        <button onclick="confirmarPedido('${p.id}')" style="width:100%; margin-top: 1rem; background: #28a745;">
+                            Confirmar Pago y Procesar
+                        </button>
+                    ` : ''}
+                `;
+                contenedor.appendChild(card);
+            });
+        }
+
+        function confirmarPedido(id) {
+            if (!confirm("¿Confirmar pago y restar stock para este pedido?")) return;
+
+            let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+            let productos = JSON.parse(localStorage.getItem("productos")) || [];
+
+            const pIndex = pedidos.findIndex(p => p.id === id);
+            if (pIndex === -1) return;
+
+            const pedido = pedidos[pIndex];
+
+            // 1. Restar Stock
+            pedido.productos.forEach(itemPedido => {
+                const prodIndex = productos.findIndex(p => p.id === itemPedido.id);
+                if (prodIndex !== -1) {
+                    productos[prodIndex].stock -= itemPedido.cantidad;
+                    if (productos[prodIndex].stock < 0) productos[prodIndex].stock = 0;
+                }
+            });
+
+            // 2. Actualizar estado del pedido
+            pedidos[pIndex].estado = "Confirmado y Procesado";
+
+            // 3. Guardar cambios
+            localStorage.setItem("pedidos", JSON.stringify(pedidos));
+            localStorage.setItem("productos", JSON.stringify(productos));
+
+            alert("✅ Pedido confirmado. El stock ha sido actualizado.");
+            cargarPedidos();
+        }
+
+        window.onload = cargarPedidos;
+    </script>
+</body>
+</html>
