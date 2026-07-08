@@ -1,12 +1,13 @@
 import json
 from datetime import datetime
 from core.utilidades import get_db_connection, registrar_log
+from core.generador_id import generar_pedido_id
 
 def crear_pedido(datos):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    pedido_id = f"PED-{int(datetime.now().timestamp())}"
+    pedido_id = generar_pedido_id()
     fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     cursor.execute('''

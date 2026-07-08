@@ -4,6 +4,11 @@ from config import Config
 from api.auth import auth_bp
 from api.productos import productos_bp
 from api.pedidos import pedidos_bp
+from api.talles import talles_bp
+from api.variantes import variantes_bp
+from api.whatsapp import whatsapp_bp
+from api.detalle_pedido import detalle_pedido_bp
+from api.comprobantes import comprobantes_bp
 
 def create_app():
     app = Flask(__name__, static_folder=None) # Desactivamos static_folder por defecto
@@ -13,6 +18,11 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(productos_bp, url_prefix='/api/productos')
     app.register_blueprint(pedidos_bp, url_prefix='/api/pedidos')
+    app.register_blueprint(talles_bp, url_prefix='/api/talles')
+    app.register_blueprint(variantes_bp, url_prefix='/api/variantes')
+    app.register_blueprint(whatsapp_bp, url_prefix='/api/whatsapp')
+    app.register_blueprint(detalle_pedido_bp, url_prefix='/api/detalle_pedido')
+    app.register_blueprint(comprobantes_bp, url_prefix='/api/comprobantes')
 
     # Servir archivos estáticos manualmente para mayor control
     @app.route('/')

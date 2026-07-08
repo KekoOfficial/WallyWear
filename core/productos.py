@@ -16,10 +16,11 @@ def crear_producto(datos):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO productos (nombre, precio, stock, cantidad_prendas, categoria, imagen, codigo_interno)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO productos (nombre, precio, stock, cantidad_prendas, categoria, imagen, codigo_interno, descripcion, material, variantes, talles)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (datos['nombre'], datos['precio'], datos['stock'], datos['cantidad_prendas'],
-          datos['categoria'], datos['imagen'], datos.get('codigo_interno')))
+          datos['categoria'], datos['imagen'], datos.get('codigo_interno'),
+          datos.get('descripcion'), datos.get('material'), datos.get('variantes'), datos.get('talles')))
     conn.commit()
     new_id = cursor.lastrowid
     conn.close()
