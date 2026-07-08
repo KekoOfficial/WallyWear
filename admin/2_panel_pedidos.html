@@ -3,17 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Mally Wear - Pedidos</title>
+    <title>Admin Wally Wear - Pedidos</title>
+    <script src="security/auth_check.js"></script>
     <link rel="stylesheet" href="css/admin_pedidos.css">
 </head>
 <body>
-    <div id="acceso-admin">
-        <h2>Acceso Administrador</h2>
-        <input type="password" id="input-id-admin" placeholder="Ingresar ID de acceso">
-        <button onclick="verificarAcceso()">Ingresar</button>
-    </div>
-
-    <div id="panel" style="display: none;">
+    <div id="panel">
         <nav style="margin-bottom: 2rem; text-align: center;">
             <a href="1_panel_productos.html" style="margin: 0 10px;">Productos</a>
             <a href="2_panel_pedidos.html" style="margin: 0 10px;">Pedidos</a>
@@ -23,30 +18,18 @@
         <div id="lista-pedidos"></div>
     </div>
 
+    <script src="../public/js/utils.js"></script>
     <script>
-        const ID_SECRETA = "Wally2026";
-
-        function verificarAcceso() {
-            const ingreso = document.getElementById("input-id-admin").value.trim();
-            if (ingreso === ID_SECRETA) {
-                document.getElementById("acceso-admin").style.display = "none";
-                document.getElementById("panel").style.display = "block";
-                cargarPedidos();
-            } else {
-                alert("❌ ID incorrecta");
-            }
-        }
+        window.onload = () => {
+            cargarPedidos();
+        };
 
         function cargarPedidos() {
             const contenedor = document.getElementById("lista-pedidos");
-            let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+            let pedidos = Utils.storage.get("pedidos") || [];
             contenedor.innerHTML = "";
 
-            // Ordenar de más reciente a más antiguo
             pedidos.sort((a, b) => {
-                // Asumiendo que el ID tiene el timestamp o usando la fecha
-                // Como PED-ID usa Date.now(), podemos extraerlo o simplemente confiar en el orden de creación si se insertan al final
-                // Pero para estar seguros, si tenemos la fecha como string, mejor usar el ID si es PED-timestamp
                 const timeA = parseInt(a.id.split('-')[1]);
                 const timeB = parseInt(b.id.split('-')[1]);
                 return timeB - timeA;
@@ -58,7 +41,7 @@
             }
 
             pedidos.forEach((pedido, index) => {
-                let detalle = pedido.productos.map(p => `${p.nombre} x${p.cantidad} = Gs ${(p.precio * p.cantidad).toLocaleString()}`).join("<br>");
+                let detalle = pedido.productos.map(p => `${p.nombre} x${p.cantidad} = ${Utils.formatCurrency(p.precio * p.cantidad)}`).join("<br>");
                 
                 contenedor.innerHTML += `
                     <div class="pedido">
@@ -66,7 +49,7 @@
                         <p>Fecha: ${pedido.fecha}</p>
                         <p>Estado: <strong>${pedido.estado}</strong></p>
                         <p>Productos:<br>${detalle}</p>
-                        <p>Total: Gs ${pedido.total.toLocaleString()}</p>
+                        <p>Total: ${Utils.formatCurrency(pedido.total)}</p>
                         ${pedido.estado === "Pendiente de pago" ? 
                             `<button onclick="confirmarPago('${pedido.id}')">✅ Confirmar pago recibido</button>` :
                             `<span>✅ Pago confirmado</span>`
@@ -77,11 +60,11 @@
         }
 
         function confirmarPago(id) {
-            const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+            const pedidos = Utils.storage.get("pedidos") || [];
             const index = pedidos.findIndex(p => p.id === id);
             if (index !== -1) {
                 pedidos[index].estado = "Pago confirmado - En preparación";
-                localStorage.setItem("pedidos", JSON.stringify(pedidos));
+                Utils.storage.set("pedidos", pedidos);
                 cargarPedidos();
                 alert("✅ Pedido confirmado correctamente");
             }

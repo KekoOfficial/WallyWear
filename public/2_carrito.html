@@ -26,10 +26,14 @@
         <div id="resultado-pedido"></div>
     </main>
 
+    <script src="js/utils.js"></script>
     <script>
-        let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-        actualizarContador();
-        mostrarCarrito();
+        let carrito = Utils.storage.get("carrito") || [];
+
+        window.onload = () => {
+            Utils.updateCartCounter();
+            mostrarCarrito();
+        };
 
         function mostrarCarrito() {
             const contenedor = document.getElementById("lista-carrito");
@@ -47,34 +51,30 @@
                 contenedor.innerHTML += `
                     <div class="item-carrito">
                         <h4>${item.nombre}</h4>
-                        <p>Precio: Gs ${item.precio.toLocaleString()}</p>
+                        <p>Precio: ${Utils.formatCurrency(item.precio)}</p>
                         <p>Cantidad: ${item.cantidad}</p>
-                        <p>Subtotal: Gs ${subtotal.toLocaleString()}</p>
+                        <p>Subtotal: ${Utils.formatCurrency(subtotal)}</p>
                         <button onclick="quitarDelCarrito(${index})">Quitar uno</button>
                     </div>
                 `;
             });
 
-            document.getElementById("total-final").innerHTML = `<h3>Total a pagar: Gs ${total.toLocaleString()}</h3>`;
+            document.getElementById("total-final").innerHTML = `<h3>Total a pagar: ${Utils.formatCurrency(total)}</h3>`;
         }
 
         function quitarDelCarrito(index) {
             if (carrito[index].cantidad > 1) carrito[index].cantidad--;
             else carrito.splice(index, 1);
-            localStorage.setItem("carrito", JSON.stringify(carrito));
+            Utils.storage.set("carrito", carrito);
             mostrarCarrito();
-            actualizarContador();
-        }
-
-        function actualizarContador() {
-            document.getElementById("contador-carrito").textContent = carrito.reduce((a, b) => a + b.cantidad, 0);
+            Utils.updateCartCounter();
         }
 
         function generarPedido() {
             if (carrito.length === 0) return alert("El carrito está vacío");
             
             const idPedido = "PED-" + Date.now();
-            const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+            const pedidos = Utils.storage.get("pedidos") || [];
             
             pedidos.push({
                 id: idPedido,
@@ -84,11 +84,11 @@
                 estado: "Pendiente de pago"
             });
 
-            localStorage.setItem("pedidos", JSON.stringify(pedidos));
-            localStorage.removeItem("carrito");
+            Utils.storage.set("pedidos", pedidos);
+            Utils.storage.remove("carrito");
             carrito = [];
             mostrarCarrito();
-            actualizarContador();
+            Utils.updateCartCounter();
 
             document.getElementById("resultado-pedido").innerHTML = `
                 <div class="aviso">
