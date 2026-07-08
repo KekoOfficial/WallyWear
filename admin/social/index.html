@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redes Sociales - Wally Wear Admin</title>
+    <script src="../security/auth_check.js"></script>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; margin-bottom: 1rem; color: #007bff; text-decoration: none; }
+        section { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .red-social { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 15px; align-items: center; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-add { background: #1a1a1a; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 20px; }
+        .btn-delete { background: #dc3545; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; }
+        .status-toggle { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">← Volver al Panel Principal</a>
+        <h1>🌐 Gestión de Redes Sociales</h1>
+        <section>
+            <div id="redes-list"></div>
+            <button class="btn-add" onclick="agregarRed()">+ Agregar Red Social</button>
+            <button class="btn-add" style="background: #28a745; margin-top: 10px;" onclick="guardarRedes()">💾 Guardar Cambios</button>
+        </section>
+    </div>
+
+    <script src="../../public/js/utils.js"></script>
+    <script>
+        let redes = Utils.storage.get("redes_sociales") || [
+            { nombre: "WhatsApp", url: "https://wa.me/595981000000", activo: true },
+            { nombre: "Instagram", url: "https://instagram.com/wallywear", activo: true }
+        ];
+
+        window.onload = renderRedes;
+
+        function renderRedes() {
+            const list = document.getElementById("redes-list");
+            list.innerHTML = "";
+            redes.forEach((red, index) => {
+                const div = document.createElement("div");
+                div.className = "red-social";
+                div.innerHTML = `
+                    <input type="text" value="${red.nombre}" onchange="updateRed(${index}, 'nombre', this.value)" placeholder="Nombre (Ej: Facebook)">
+                    <input type="text" value="${red.url}" onchange="updateRed(${index}, 'url', this.value)" placeholder="URL (https://...)">
+                    <div style="display:flex; gap:5px; align-items:center;">
+                        <input type="checkbox" class="status-toggle" ${red.activo ? 'checked' : ''} onchange="updateRed(${index}, 'activo', this.checked)">
+                        <button class="btn-delete" onclick="eliminarRed(${index})">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function updateRed(index, key, value) {
+            redes[index][key] = value;
+        }
+
+        function agregarRed() {
+            redes.push({ nombre: "", url: "", activo: true });
+            renderRedes();
+        }
+
+        function eliminarRed(index) {
+            redes.splice(index, 1);
+            renderRedes();
+        }
+
+        function guardarRedes() {
+            Utils.storage.set("redes_sociales", redes);
+            alert("✅ Redes sociales actualizadas");
+        }
+    </script>
+</body>
+</html>

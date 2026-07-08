@@ -20,19 +20,19 @@
 
     <main>
         <h2>Política de Privacidad y Condiciones</h2>
-        <div class="texto-politica">
-            <h3>1. Información que recopilamos</h3>
-            <p>Solo usamos los datos necesarios para procesar tu pedido, no compartimos información con terceros.</p>
-
-            <h3>2. Métodos de pago</h3>
-            <p>Aceptamos transferencias bancarias. El pedido se confirma solo al verificar el comprobante de pago.</p>
-
-            <h3>3. Envíos y entregas</h3>
-            <p>Una vez confirmado el pago, coordinamos la entrega dentro de las 48hs hábiles.</p>
-
-            <h3>4. Cambios y devoluciones</h3>
-            <p>Solo se aceptan cambios si el producto presenta fallas de fábrica en un plazo de 3 días.</p>
+        <div class="texto-politica" id="contenido-politicas">
+            <!-- Cargado dinámicamente -->
+            Cargando políticas...
         </div>
     </main>
+
+    <script src="js/utils.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        window.onload = () => {
+            const contenido = Utils.storage.get("site_policies") || `<p>Las políticas de la tienda se están actualizando. Por favor, contacta con soporte para más información.</p>`;
+            document.getElementById("contenido-politicas").innerHTML = contenido;
+        };
+    </script>
 </body>
 </html>
