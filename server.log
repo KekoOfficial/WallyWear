@@ -5,14 +5,19 @@
  * Running on http://127.0.0.1:8080
  * Running on http://192.168.0.2:8080
 [33mPress CTRL+C to quit[0m
-127.0.0.1 - - [08/Jul/2026 19:35:38] "[32mGET / HTTP/1.1[0m" 302 -
-127.0.0.1 - - [08/Jul/2026 19:35:39] "GET /public/tienda.html HTTP/1.1" 200 -
-127.0.0.1 - - [08/Jul/2026 19:35:39] "GET /public/css/estilos_tienda.css HTTP/1.1" 200 -
-127.0.0.1 - - [08/Jul/2026 19:35:39] "GET /public/css/estilos_responsivo.css HTTP/1.1" 200 -
-127.0.0.1 - - [08/Jul/2026 19:35:39] "GET /public/js/footer.js HTTP/1.1" 200 -
-127.0.0.1 - - [08/Jul/2026 19:35:39] "GET /public/js/utils.js HTTP/1.1" 200 -
-127.0.0.1 - - [08/Jul/2026 19:35:39] "GET /public/css/estilos_generales.css HTTP/1.1" 200 -
-127.0.0.1 - - [08/Jul/2026 19:35:39] "GET /api/productos/ HTTP/1.1" 200 -
-127.0.0.1 - - [08/Jul/2026 19:35:42] "GET /admin/0_acceso_admin.html HTTP/1.1" 200 -
-127.0.0.1 - - [08/Jul/2026 19:35:42] "[36mGET /public/css/estilos_generales.css HTTP/1.1[0m" 304 -
-127.0.0.1 - - [08/Jul/2026 19:35:42] "[36mGET /public/js/utils.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "GET /public/tienda.html HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "GET /public/css/estilos_generales.css HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "GET /public/js/utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "GET /public/js/footer.js HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "GET /public/css/estilos_responsivo.css HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "GET /public/css/estilos_tienda.css HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "GET /api/productos/ HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "GET /admin/0_acceso_admin.html HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "[36mGET /public/js/utils.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [08/Jul/2026 20:14:12] "[36mGET /public/css/estilos_generales.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [08/Jul/2026 20:14:13] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:13] "GET /admin/menu_principal.html HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:13] "GET /admin/js/seguridad.js HTTP/1.1" 200 -
+127.0.0.1 - - [08/Jul/2026 20:14:13] "[36mGET /public/css/estilos_generales.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [08/Jul/2026 20:14:13] "[36mGET /public/js/utils.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [08/Jul/2026 20:14:13] "GET /api/auth/check HTTP/1.1" 200 -

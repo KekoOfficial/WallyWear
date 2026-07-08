@@ -1,4 +1,4 @@
-# Wally Wear
+# Mally Wear
 
 Tienda de ropa y calzado para Paraguay.
 

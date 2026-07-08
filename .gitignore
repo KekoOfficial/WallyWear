@@ -2,7 +2,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .env
-database/wallywear.db
+database/mallywear.db
 uploads/*
 !uploads/.gitkeep
 backups/*
