@@ -38,7 +38,11 @@ def add_producto():
                 'stock': int(request.form.get('stock')),
                 'cantidad_prendas': int(request.form.get('cantidad_prendas', 1)),
                 'categoria': request.form.get('categoria'),
-                'imagen': filename
+                'imagen': filename,
+                'descripcion': request.form.get('descripcion'),
+                'material': request.form.get('material'),
+                'variantes': request.form.get('variantes'),
+                'talles': request.form.get('talles')
             }
             new_id = crear_producto(data)
             return jsonify({"success": True, "id": new_id})
