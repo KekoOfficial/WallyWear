@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Wally Wear - Pedidos</title>
+    <link rel="stylesheet" href="../css/admin_pedidos.css">
+</head>
+<body>
+    <div id="panel">
+        <nav style="margin-bottom: 2rem; text-align: center; padding: 1rem; background: #eee;">
+            <a href="../products/index.html" style="margin: 0 10px;">Productos</a>
+            <a href="index.html" style="margin: 0 10px;">Pedidos</a>
+            <a href="../../public/catalog/index.html" style="margin: 0 10px;">Ver Tienda</a>
+            <button onclick="cerrarSesion()" style="margin-left: 20px; background: #555; padding: 5px 15px;">Cerrar Sesión</button>
+        </nav>
+
+        <main style="max-width: 900px; margin: 0 auto; padding: 1rem;">
+            <h1>Gestión de Pedidos</h1>
+            <div id="lista-pedidos"></div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../security/auth_check.js"></script>
+    <script src="orders.js"></script>
+</body>
+</html>
