@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 import os
-from core.productos import listar_productos, crear_producto, eliminar_producto
+from core.productos import listar_productos, crear_producto, eliminar_producto, obtener_producto, actualizar_producto
 from functools import wraps
 from flask import session
 
@@ -18,6 +18,13 @@ def admin_required(f):
 @productos_bp.route('/', methods=['GET'])
 def get_productos():
     return jsonify(listar_productos())
+
+@productos_bp.route('/<int:id>', methods=['GET'])
+def get_producto_by_id(id):
+    prod = obtener_producto(id)
+    if prod:
+        return jsonify(prod)
+    return jsonify({"error": "Producto no encontrado"}), 404
 
 @productos_bp.route('/', methods=['POST'])
 @admin_required
@@ -39,15 +46,22 @@ def add_producto():
                 'cantidad_prendas': int(request.form.get('cantidad_prendas', 1)),
                 'categoria': request.form.get('categoria'),
                 'imagen': filename,
-                'descripcion': request.form.get('descripcion'),
-                'material': request.form.get('material'),
-                'variantes': request.form.get('variantes'),
-                'talles': request.form.get('talles')
+                'descripcion': request.form.get('descripcion', ''),
+                'material': request.form.get('material', ''),
+                'variantes': request.form.get('variantes', '[]'),
+                'talles': request.form.get('talles', '[]')
             }
             new_id = crear_producto(data)
             return jsonify({"success": True, "id": new_id})
 
     return jsonify({"success": False, "message": "Imagen requerida"}), 400
+
+@productos_bp.route('/<int:id>', methods=['PUT'])
+@admin_required
+def update_producto_route(id):
+    data = request.json
+    success = actualizar_producto(id, data)
+    return jsonify({"success": success})
 
 @productos_bp.route('/<int:id>', methods=['DELETE'])
 @admin_required

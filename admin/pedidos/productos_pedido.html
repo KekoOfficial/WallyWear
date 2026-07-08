@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prendas del Pedido - Mally Wear</title>
+    <script src="../js/seguridad.js"></script>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --bg: #f8f9fa;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .item-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .item-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .item-info {
+            flex: 1;
+        }
+        .item-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        .item-info p {
+            margin: 4px 0;
+            color: #666;
+            font-size: 0.95rem;
+        }
+        .item-subtotal {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #007bff;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="titulo-pedido">📦 Prendas del Pedido</h1>
+            <a id="link-regreso" href="detalle_pedido.html" class="back-btn">← Volver al Detalle</a>
+        </div>
+
+        <div id="productos-container">
+            <p>Cargando prendas del pedido...</p>
+        </div>
+    </div>
+
+    <script src="../../public/js/utils.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            if (!id) {
+                document.getElementById("productos-container").innerHTML = "<p>ID de pedido no especificado.</p>";
+                return;
+            }
+
+            document.getElementById("link-regreso").href = `detalle_pedido.html?id=${id}`;
+            document.getElementById("titulo-pedido").textContent = `📦 Prendas del Pedido #${id}`;
+            cargarProductosPedido(id);
+        });
+
+        async function cargarProductosPedido(id) {
+            const container = document.getElementById("productos-container");
+            try {
+                const p = await Utils.api.fetch(`/api/detalle_pedido/${id}`);
+                if (!p || !p.productos || p.productos.length === 0) {
+                    container.innerHTML = "<p>No hay prendas registradas para este pedido.</p>";
+                    return;
+                }
+
+                container.innerHTML = "";
+                p.productos.forEach(item => {
+                    const subtotal = item.precio * item.cantidad;
+                    const card = document.createElement("div");
+                    card.className = "item-card";
+
+                    const tallaLabel = item.talla || p.talla || 'No especificado';
+                    const varianteLabel = item.variante || p.variante || 'No especificada';
+
+                    card.innerHTML = `
+                        <img class="item-img" src="../../uploads/productos/${item.imagen}" alt="${item.nombre}" onerror="this.src='https://via.placeholder.com/100?text=${item.nombre}'">
+                        <div class="item-info">
+                            <h3>${item.nombre}</h3>
+                            <p><strong style="color:#555;">Categoría:</strong> ${item.categoria || 'General'}</p>
+                            <p><strong style="color:#555;">Precio unitario:</strong> ${Utils.formatCurrency(item.precio)}</p>
+                            <p><strong style="color:#555;">Cantidad:</strong> ${item.cantidad}</p>
+                            <p><strong style="color:#555;">Talle seleccionado:</strong> ${tallaLabel}</p>
+                            <p><strong style="color:#555;">Variante seleccionada:</strong> ${varianteLabel}</p>
+                        </div>
+                        <div class="item-subtotal">
+                            Subtotal:<br>
+                            ${Utils.formatCurrency(subtotal)}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                container.innerHTML = "<p>Error al cargar las prendas del pedido.</p>";
+            }
+        }
+    </script>
+</body>
+</html>

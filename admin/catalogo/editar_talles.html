@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Talles - Mally Wear</title>
+    <script src="../js/seguridad.js"></script>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --bg: #f8f9fa;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .grid-talles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+            margin-top: 1.5rem;
+        }
+        .card-talle {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            color: var(--primary);
+            text-align: center;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card-talle:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .card-talle span {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .card-talle h3 {
+            margin: 5px 0;
+            font-size: 1.2rem;
+        }
+        .card-talle p {
+            font-size: 0.85rem;
+            color: #666;
+            margin: 0;
+            font-weight: normal;
+        }
+        .top-actions {
+            margin-bottom: 1.5rem;
+        }
+        .btn-add {
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📐 Configuración de Talles</h1>
+            <a href="../1_catalogo_productos.html" class="back-btn">← Volver al Catálogo</a>
+        </div>
+
+        <div class="top-actions">
+            <a href="agregar_talle.html" class="btn-add">➕ Agregar Talle Único</a>
+        </div>
+
+        <div class="grid-talles">
+            <a href="talles/calzado.html" class="card-talle">
+                <span>👟</span>
+                <h3>Talles de Calzado</h3>
+                <p>Configuración numérica (35 - 45)</p>
+            </a>
+            <a href="talles/remeras.html" class="card-talle">
+                <span>👕</span>
+                <h3>Talles de Remeras</h3>
+                <p>Configuración alfabética (S, M, L...)</p>
+            </a>
+            <a href="talles/pantalones.html" class="card-talle">
+                <span>👖</span>
+                <h3>Talles de Pantalones</h3>
+                <p>Configuración numérica (36 - 54)</p>
+            </a>
+            <a href="talles/shorts.html" class="card-talle">
+                <span>🩳</span>
+                <h3>Talles de Shorts</h3>
+                <p>Configuración alfabética (S, M, L...)</p>
+            </a>
+            <a href="talles/personalizados.html" class="card-talle">
+                <span>🎨</span>
+                <h3>Talles Personalizados</h3>
+                <p>Configuración a medida del producto</p>
+            </a>
+        </div>
+    </div>
+
+    <script src="../../public/js/utils.js"></script>
+</body>
+</html>

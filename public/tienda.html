@@ -26,8 +26,6 @@
     <script src="js/utils.js"></script>
     <script src="js/footer.js"></script>
     <script>
-        let carrito = Utils.storage.get("carrito") || [];
-
         window.onload = () => {
             Utils.updateCartCounter();
             cargarProductos();
@@ -36,7 +34,6 @@
         async function cargarProductos() {
             try {
                 const productos = await Utils.api.fetch("/api/productos/");
-                // Por ahora usamos categorías fijas o las extraemos de los productos
                 const categorias = [...new Set(productos.map(p => p.categoria))];
                 if (categorias.length === 0) categorias.push("General");
 
@@ -59,14 +56,16 @@
                     const lista = section.querySelector(".productos-lista");
                     productosCat.forEach(p => {
                         lista.innerHTML += `
-                            <div class="producto">
-                                <img src="../uploads/productos/${p.imagen}" onerror="this.src='https://via.placeholder.com/150?text=${p.nombre}'" alt="${p.nombre}">
-                                <h3>${p.nombre}</h3>
-                                <p class="precio">${Utils.formatCurrency(p.precio)}</p>
-                                <p class="meta">Stock: ${p.stock} | Unidades: ${p.cantidad_prendas || 1}</p>
-                                <button onclick="agregar(${p.id})" ${p.stock < 1 ? "disabled" : ""}>
-                                    ${p.stock < 1 ? "Sin stock" : "Agregar al carrito"}
-                                </button>
+                            <div class="producto" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <img src="../uploads/productos/${p.imagen}" onerror="this.src='https://via.placeholder.com/150?text=${p.nombre}'" alt="${p.nombre}">
+                                    <h3>${p.nombre}</h3>
+                                    <p class="precio">${Utils.formatCurrency(p.precio)}</p>
+                                    <p class="meta">Stock: ${p.stock} | Unidades: ${p.cantidad_prendas || 1}</p>
+                                </div>
+                                <a href="producto.html?id=${p.id}" style="display:block; text-align:center; background:#1a1a1a; color:white; padding:12px; border-radius:8px; text-decoration:none; font-weight:bold; margin-top:10px;">
+                                    ${p.stock < 1 ? "Ver Detalles" : "Ver / Comprar"}
+                                </a>
                             </div>
                         `;
                     });
@@ -79,23 +78,6 @@
             } catch (err) {
                 document.getElementById("contenedor-tienda").innerHTML = "<p>Error al cargar productos.</p>";
             }
-        }
-
-        function agregar(id) {
-            // Necesitamos los datos del producto, los buscamos en la UI o volvemos a pedir?
-            // Para simplicidad, volveremos a usar localStorage para el carrito temporalmente
-            // pero los datos vienen de la API.
-            fetch("/api/productos/").then(r => r.json()).then(productos => {
-                const prod = productos.find(x => x.id === id);
-                if (!prod || prod.stock < 1) return;
-
-                const existe = carrito.find(x => x.id === id);
-                existe ? existe.cantidad++ : carrito.push({...prod, cantidad: 1});
-
-                Utils.storage.set("carrito", carrito);
-                Utils.updateCartCounter();
-                alert("✅ Agregado");
-            });
         }
     </script>
 </body>

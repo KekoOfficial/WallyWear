@@ -10,11 +10,15 @@ def crear_pedido(datos):
     pedido_id = generar_pedido_id()
     fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    talla = datos.get('talla', '')
+    variante = datos.get('variante', '')
+    comprobante = datos.get('comprobante', '')
+
     cursor.execute('''
-        INSERT INTO pedidos (id, fecha, cliente_nombre, cliente_telefono, total, productos, estado)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO pedidos (id, fecha, cliente_nombre, cliente_telefono, total, productos, estado, talla, variante, comprobante)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (pedido_id, fecha, datos.get('nombre'), datos.get('telefono'),
-          datos['total'], json.dumps(datos['productos']), 'pendiente'))
+          datos['total'], json.dumps(datos['productos']), 'pendiente', talla, variante, comprobante))
 
     conn.commit()
     conn.close()
@@ -41,6 +45,7 @@ def confirmar_pago(pedido_id):
     # Descontar stock
     for item in productos_pedido:
         conn.execute('UPDATE productos SET stock = stock - ? WHERE id = ?', (item['cantidad'], item['id']))
+        registrar_log("cambios_stock", f"Stock descontado para producto ID {item['id']}: -{item['cantidad']}")
 
     # Actualizar pedido
     conn.execute('UPDATE pedidos SET estado = "pagado" WHERE id = ?', (pedido_id,))
@@ -48,7 +53,22 @@ def confirmar_pago(pedido_id):
     conn.commit()
     conn.close()
     registrar_log("inventario", f"Stock descontado por pedido {pedido_id}")
+    registrar_log("confirmaciones", f"Pago confirmado para el pedido: {pedido_id}")
     return True, "Pago confirmado y stock actualizado"
+
+def cancelar_pedido_db(pedido_id):
+    conn = get_db_connection()
+    pedido = conn.execute('SELECT * FROM pedidos WHERE id = ?', (pedido_id,)).fetchone()
+
+    if not pedido:
+        conn.close()
+        return False, "Pedido no encontrado"
+
+    conn.execute('UPDATE pedidos SET estado = "cancelado" WHERE id = ?', (pedido_id,))
+    conn.commit()
+    conn.close()
+    registrar_log("confirmaciones", f"Pedido cancelado: {pedido_id}")
+    return True, "Pedido cancelado correctamente"
 
 def listar_pedidos():
     conn = get_db_connection()

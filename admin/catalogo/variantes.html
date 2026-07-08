@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Variantes - Mally Wear</title>
+    <script src="../js/seguridad.js"></script>
+    <link rel="stylesheet" href="../../public/css/estilos_generales.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --bg: #f8f9fa;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .variant-tag {
+            display: inline-flex;
+            align-items: center;
+            background: #e9ecef;
+            color: #495057;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .variant-tag button {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-weight: bold;
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        .btn-add {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-save {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1.5rem;
+        }
+        .variants-list {
+            min-height: 50px;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Gestión de Variantes</h1>
+            <a href="../1_catalogo_productos.html" class="back-btn">← Volver al Catálogo</a>
+        </div>
+
+        <div class="card">
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Selecciona un Producto:</label>
+            <select id="select-producto" class="form-control" onchange="seleccionarProducto()">
+                <option value="">-- Selecciona un producto --</option>
+            </select>
+        </div>
+
+        <div id="variantes-editor" class="card" style="display: none;">
+            <h2 id="producto-titulo">Variantes del producto</h2>
+
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Variantes Actuales (Ej: Colores, Sabores, etc.):</label>
+            <div id="lista-variantes" class="variants-list"></div>
+
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="nueva-variante" class="form-control" style="margin-bottom: 0;" placeholder="Ej: Rojo, Azul, Cuero...">
+                <button class="btn-add" onclick="agregarVarianteLocal()">+ Agregar</button>
+            </div>
+
+            <button class="btn-save" onclick="guardarVariantesServidor()">💾 Guardar Variantes del Producto</button>
+        </div>
+    </div>
+
+    <script src="../../public/js/utils.js"></script>
+    <script src="../js/variantes.js"></script>
+</body>
+</html>

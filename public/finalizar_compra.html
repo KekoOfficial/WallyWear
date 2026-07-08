@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mally Wear - Finalizar Compra</title>
+    <link rel="stylesheet" href="css/estilos_generales.css">
+    <link rel="stylesheet" href="css/estilos_carrito.css">
+    <link rel="stylesheet" href="css/estilos_responsivo.css">
+    <style>
+        .checkout-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .checkout-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #444;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .recap-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        .recap-item:last-child {
+            border-bottom: none;
+        }
+        .btn-submit {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+        .btn-submit:hover {
+            background: #218838;
+        }
+        .success-box {
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border: 1px solid #c3e6cb;
+        }
+        .whatsapp-btn {
+            background: #25d366;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mally Wear</h1>
+        <nav>
+            <a href="tienda.html">Tienda</a>
+            <a href="carrito.html">Carrito (<span id="contador">0</span>)</a>
+            <a href="politica_privacidad.html">Políticas</a>
+        </nav>
+    </header>
+
+    <main class="checkout-container">
+        <!-- Form section -->
+        <div class="checkout-card" id="form-container">
+            <h2>Datos de Envío y Pago</h2>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 1.5rem;">Por favor completa los siguientes datos para procesar tu pedido:</p>
+
+            <div class="form-group">
+                <label for="cliente-nombre">Nombre y Apellido *</label>
+                <input type="text" id="cliente-nombre" class="form-control" placeholder="Ej: Juan Pérez" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cliente-telefono">Teléfono (WhatsApp) *</label>
+                <input type="tel" id="cliente-telefono" class="form-control" placeholder="Ej: 0981XXXXXX" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cliente-direccion">Dirección de Entrega / Sucursal *</label>
+                <input type="text" id="cliente-direccion" class="form-control" placeholder="Ej: Avda. Mcal. López 123, Asunción" required>
+            </div>
+
+            <div class="form-group">
+                <label for="metodo-pago">Método de Pago *</label>
+                <select id="metodo-pago" class="form-control" required>
+                    <option value="Transferencia Bancaria">Transferencia Bancaria (Recomendado)</option>
+                    <option value="Giro Tigo">Giro Tigo</option>
+                    <option value="Efectivo contra entrega">Efectivo contra entrega</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="archivo-comprobante">Adjuntar Comprobante de Transferencia (Opcional):</label>
+                <input type="file" id="archivo-comprobante" class="form-control" accept="image/*">
+            </div>
+
+            <button class="btn-submit" onclick="finalizarPedido()">🛒 Confirmar Pedido y Continuar</button>
+        </div>
+
+        <!-- Success view (Hidden by default) -->
+        <div class="checkout-card" id="success-container" style="display: none; grid-column: 1 / -1; max-width: 600px; margin: 0 auto; width: 100%;">
+            <div class="success-box">
+                <h3 style="margin: 0 0 10px 0; font-size: 1.5rem;">🎉 ¡Pedido Creado con Éxito!</h3>
+                <p style="margin: 0;">Tu ID de Pedido es: <strong id="success-pedido-id" style="font-size: 1.2rem; text-decoration: underline;">PED-XXXXXXXX</strong></p>
+            </div>
+
+            <p style="color: #444; line-height: 1.5; text-align: center;">
+                Para finalizar tu compra, haz click abajo para enviar los detalles de tu pedido a nuestro WhatsApp de atención al cliente. Si subiste una foto del comprobante, ya estará registrada en nuestro sistema para acelerar la confirmación.
+            </p>
+
+            <a href="#" id="whatsapp-link-btn" class="whatsapp-btn" target="_blank">
+                💬 Enviar pedido por WhatsApp
+            </a>
+
+            <a href="tienda.html" style="display: block; text-align: center; margin-top: 1.5rem; color: #007bff; text-decoration: none; font-weight: bold;">← Volver a la Tienda</a>
+        </div>
+
+        <!-- Recap section -->
+        <div class="checkout-card" id="recap-container">
+            <h2>Resumen del Pedido</h2>
+            <div id="recap-items-list" style="margin-top: 1.5rem;">
+                <p>Cargando resumen...</p>
+            </div>
+            <div id="recap-total-section" style="margin-top: 1.5rem; border-top: 1.5px solid #eee; padding-top: 1rem;">
+                <!-- Total injection -->
+            </div>
+        </div>
+    </main>
+
+    <script src="js/utils.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        let carrito = Utils.storage.get("carrito") || [];
+
+        window.onload = () => {
+            Utils.updateCartCounter();
+            renderResumen();
+        };
+
+        function renderResumen() {
+            const listContainer = document.getElementById("recap-items-list");
+            const totalContainer = document.getElementById("recap-total-section");
+
+            if (carrito.length === 0) {
+                listContainer.innerHTML = "<p>No tienes productos en el carrito.</p>";
+                totalContainer.innerHTML = "";
+                return;
+            }
+
+            listContainer.innerHTML = "";
+            let total = 0;
+
+            carrito.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+
+                const row = document.createElement("div");
+                row.className = "recap-item";
+                row.innerHTML = `
+                    <div>
+                        <strong style="font-size: 0.95rem;">${item.nombre} x${item.cantidad}</strong><br>
+                        <span style="font-size: 0.85rem; color: #666;">Talle: ${item.talle} | Var: ${item.variante}</span>
+                    </div>
+                    <span style="font-weight: bold; font-size: 0.95rem;">${Utils.formatCurrency(subtotal)}</span>
+                `;
+                listContainer.appendChild(row);
+            });
+
+            totalContainer.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 1rem; color: #555; font-weight: bold;">Total General:</span>
+                    <h3 style="margin: 0; font-size: 1.6rem; color: #007bff;">${Utils.formatCurrency(total)}</h3>
+                </div>
+            `;
+        }
+
+        async function finalizarPedido() {
+            const nombre = document.getElementById("cliente-nombre").value.trim();
+            const telefono = document.getElementById("cliente-telefono").value.trim();
+            const direccion = document.getElementById("cliente-direccion").value.trim();
+            const metodoPago = document.getElementById("metodo-pago").value;
+
+            if (!nombre || !telefono || !direccion) {
+                alert("⚠️ Por favor completa todos los campos obligatorios antes de continuar.");
+                return;
+            }
+
+            if (carrito.length === 0) {
+                alert("El carrito está vacío.");
+                return;
+            }
+
+            const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+
+            // Prepare order payload
+            const orderPayload = {
+                nombre: nombre,
+                telefono: telefono,
+                direccion: direccion,
+                metodo_pago: metodoPago,
+                total: total,
+                productos: carrito,
+                // Pass chosen first size and variant for quick listing/historical references
+                talla: carrito[0].talle,
+                variante: carrito[0].variante
+            };
+
+            try {
+                // Post order details to create SQLite order record
+                const response = await Utils.api.fetch("/api/pedidos/", {
+                    method: 'POST',
+                    body: JSON.stringify(orderPayload)
+                });
+
+                if (response.success && response.pedido_id) {
+                    const pedidoId = response.pedido_id;
+
+                    // Upload bank transfer receipt if present
+                    const fileInput = document.getElementById("archivo-comprobante");
+                    if (fileInput && fileInput.files[0]) {
+                        const formData = new FormData();
+                        formData.append("comprobante", fileInput.files[0]);
+
+                        try {
+                            await fetch(`/api/comprobantes/${pedidoId}`, {
+                                method: 'POST',
+                                body: formData
+                            });
+                        } catch (e) {
+                            console.error("No se pudo subir comprobante:", e);
+                        }
+                    }
+
+                    // Fetch the formatted WhatsApp message from server
+                    const wsData = await Utils.api.fetch(`/api/whatsapp/mensaje/${pedidoId}`);
+                    let waNumber = wsData.numero || "+595981000000";
+                    waNumber = waNumber.replace("INACTIVE:", "").replace("+", "");
+
+                    // Generate local fallback WhatsApp link if needed
+                    let waMessage = wsData.mensaje;
+                    if (!waMessage) {
+                        const totalFormated = `${total:,.0f}`.replace(",", ".");
+                        waMessage = `Hola.\nMi pedido es el ID #${pedidoId}.\n\nTotal a pagar:\nGs ${totalFormated}.\n\nAdjunto mi comprobante de transferencia.\n\nMuchas gracias.`;
+                    }
+
+                    const waUrl = `https://api.whatsapp.com/send?phone=${waNumber}&text=${encodeURIComponent(waMessage)}`;
+
+                    // Setup Success View
+                    document.getElementById("form-container").style.display = "none";
+                    document.getElementById("recap-container").style.display = "none";
+                    document.getElementById("success-pedido-id").textContent = pedidoId;
+                    document.getElementById("whatsapp-link-btn").href = waUrl;
+                    document.getElementById("success-container").style.display = "block";
+
+                    // Clear local cart
+                    Utils.storage.remove("carrito");
+                    Utils.updateCartCounter();
+                } else {
+                    alert("Error al procesar el pedido. Inténtalo de nuevo.");
+                }
+            } catch (err) {
+                alert("Error al guardar pedido: " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
