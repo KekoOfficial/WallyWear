@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DB_PATH = 'database/wallywear.db'
+DB_PATH = 'database/mallywear.db'
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -76,9 +76,9 @@ def init_db():
 
     # Insertar configuración inicial
     config_inicial = [
-        ('pass_master', 'WallyMaster2026'),
-        ('pass_verif', 'WallyShop_777'),
-        ('nombre_tienda', 'Wally Wear')
+        ('pass_master', '1111'),
+        ('pass_verif', '2222'),
+        ('nombre_tienda', 'Mally Wear')
     ]
     cursor.executemany('INSERT OR IGNORE INTO configuracion (clave, valor) VALUES (?, ?)', config_inicial)
 

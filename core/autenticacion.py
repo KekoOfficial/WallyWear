@@ -7,7 +7,7 @@ def verificar_credenciales(master, verif):
     conn.close()
 
     if not pass_master or not pass_verif:
-        return master == 'WallyMaster2026' and verif == 'WallyShop_777'
+        return master == '1111' and verif == '2222'
 
     return master == pass_master['valor'] and verif == pass_verif['valor']
 
