@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wally Wear - Carrito</title>
+    <link rel="stylesheet" href="../css/estilos_generales.css">
+    <link rel="stylesheet" href="../css/estilos_carrito.css">
+    <link rel="stylesheet" href="../css/estilos_responsivo.css">
+</head>
+<body>
+    <header>
+        <h1>Wally Wear</h1>
+        <nav>
+            <a href="../catalog/index.html">Tienda</a>
+            <a href="index.html">Carrito (<span id="contador-carrito">0</span>)</a>
+            <a href="../privacy/index.html">Políticas</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Tu Carrito de Compras</h2>
+        <div id="lista-carrito"></div>
+        <div id="total-final"></div>
+        <button id="btn-pedir" onclick="generarPedido()" style="display: none;">Generar Pedido</button>
+        <div id="resultado-pedido"></div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/cart.js"></script>
+</body>
+</html>

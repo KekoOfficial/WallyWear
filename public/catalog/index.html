@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wally Wear - Tienda</title>
+    <link rel="stylesheet" href="../css/estilos_generales.css">
+    <link rel="stylesheet" href="../css/estilos_tienda.css">
+    <link rel="stylesheet" href="../css/estilos_responsivo.css">
+</head>
+<body>
+    <header>
+        <h1>Wally Wear</h1>
+        <nav>
+            <a href="index.html">Tienda</a>
+            <a href="../cart/index.html">Carrito (<span id="contador">0</span>)</a>
+            <a href="../privacy/index.html">Políticas</a>
+            <a href="../../admin/login/index.html">Acceso Admin</a>
+        </nav>
+    </header>
+
+    <main id="contenedor-tienda">
+        <!-- Las categorías y productos se cargarán dinámicamente -->
+        <div class="cargando">Cargando catálogo...</div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/catalog.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Wally Wear - Productos</title>
+    <link rel="stylesheet" href="../css/admin_productos.css">
+</head>
+<body>
+    <div id="panel">
+        <nav style="margin-bottom: 2rem; text-align: center; padding: 1rem; background: #eee;">
+            <a href="index.html" style="margin: 0 10px;">Productos</a>
+            <a href="../orders/index.html" style="margin: 0 10px;">Pedidos</a>
+            <a href="../../public/catalog/index.html" style="margin: 0 10px;">Ver Tienda</a>
+            <button onclick="cerrarSesion()" style="margin-left: 20px; background: #555; padding: 5px 15px;">Cerrar Sesión</button>
+        </nav>
+
+        <main style="max-width: 900px; margin: 0 auto; padding: 1rem;">
+            <h1>Gestión de Productos y Categorías</h1>
+
+            <section style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h3>Crear nueva categoría</h3>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" id="nueva-cat" placeholder="Ej: Remeras, Zapatillas..." style="flex-grow: 1; padding: 8px;">
+                    <button onclick="crearCategoria()">Crear</button>
+                </div>
+            </section>
+
+            <section style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h3>Agregar / Editar Producto</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                    <input type="text" id="nombre" placeholder="Nombre del producto">
+                    <input type="number" id="precio" placeholder="Precio en Gs">
+                    <input type="number" id="stock" placeholder="Cantidad en stock">
+                    <input type="text" id="imagen" placeholder="Nombre de imagen (ej: remera1.jpg)">
+                    <select id="categoria"></select>
+                    <button onclick="guardarProducto()" style="grid-column: span 2;">Guardar Producto</button>
+                </div>
+            </section>
+
+            <section>
+                <h3>Lista de Productos</h3>
+                <div id="lista-admin"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../security/auth_check.js"></script>
+    <script src="products.js"></script>
+</body>
+</html>
