@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración - Wally Wear</title>
-    <script src="security/auth_check.js"></script>
+    <script src="js/seguridad.js"></script>
     <link rel="stylesheet" href="../public/css/estilos_generales.css">
     <style>
         :root {
@@ -32,6 +32,8 @@
             border-radius: 8px;
             text-decoration: none;
             font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
         }
         .menu-grid {
             display: grid;
@@ -57,11 +59,6 @@
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
-        .menu-card i {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--accent);
-        }
         .menu-card h3 {
             margin: 0.5rem 0;
             font-size: 1.2rem;
@@ -76,36 +73,37 @@
 <body>
     <header class="admin-header">
         <h1>Wally Wear Admin</h1>
-        <a href="#" onclick="logout()" class="logout-btn">Cerrar Sesión</a>
+        <button onclick="logout()" class="logout-btn">Cerrar Sesión</button>
     </header>
 
     <main class="menu-grid">
-        <a href="products/index.html" class="menu-card">
+        <a href="1_catalogo_productos.html" class="menu-card">
             <h3>📦 Gestión de Catálogo</h3>
             <p>Productos, stock y categorías</p>
         </a>
-        <a href="orders/index.html" class="menu-card">
+        <a href="2_pedidos_solicitudes.html" class="menu-card">
             <h3>📑 Gestión de Pedidos</h3>
             <p>Ver solicitudes y procesar pagos</p>
         </a>
-        <a href="social/index.html" class="menu-card">
+        <a href="3_redes_contacto.html" class="menu-card">
             <h3>🌐 Redes Sociales</h3>
             <p>Configurar links de contacto</p>
         </a>
-        <a href="policies/index.html" class="menu-card">
+        <a href="4_contenido_sitio.html" class="menu-card">
             <h3>📝 Políticas y Contenido</h3>
             <p>Editar textos legales y del sitio</p>
         </a>
-        <a href="settings/index.html" class="menu-card">
+        <a href="5_configuracion_general.html" class="menu-card">
             <h3>⚙️ Configuraciones</h3>
             <p>Estado del sistema y seguridad</p>
         </a>
     </main>
 
+    <script src="../public/js/utils.js"></script>
     <script>
-        function logout() {
-            sessionStorage.removeItem('admin_auth');
-            window.location.href = 'login/index.html';
+        async function logout() {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = '0_acceso_admin.html';
         }
     </script>
 </body>

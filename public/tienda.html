@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wally Wear - Tienda</title>
+    <link rel="stylesheet" href="css/estilos_generales.css">
+    <link rel="stylesheet" href="css/estilos_tienda.css">
+    <link rel="stylesheet" href="css/estilos_responsivo.css">
+</head>
+<body>
+    <header>
+        <h1>Wally Wear</h1>
+        <nav>
+            <a href="tienda.html">Tienda</a>
+            <a href="carrito.html">Carrito (<span id="contador">0</span>)</a>
+            <a href="politica_privacidad.html">Políticas</a>
+            <a href="../admin/0_acceso_admin.html">Acceso Admin</a>
+        </nav>
+    </header>
+
+    <main id="contenedor-tienda">
+        <p>Cargando productos...</p>
+    </main>
+
+    <script src="js/utils.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        let carrito = Utils.storage.get("carrito") || [];
+
+        window.onload = () => {
+            Utils.updateCartCounter();
+            cargarProductos();
+        };
+
+        async function cargarProductos() {
+            try {
+                const productos = await Utils.api.fetch("/api/productos/");
+                // Por ahora usamos categorías fijas o las extraemos de los productos
+                const categorias = [...new Set(productos.map(p => p.categoria))];
+                if (categorias.length === 0) categorias.push("General");
+
+                const contenedor = document.getElementById("contenedor-tienda");
+                contenedor.innerHTML = "";
+
+                categorias.forEach(cat => {
+                    const productosCat = productos.filter(p => p.categoria === cat);
+                    if (productosCat.length === 0) return;
+
+                    const section = document.createElement("section");
+                    section.className = "categoria";
+                    section.id = `cat-${cat.toLowerCase().replace(/\s+/g, '-')}`;
+
+                    section.innerHTML = `
+                        <h2>${cat}</h2>
+                        <div class="productos-lista"></div>
+                    `;
+
+                    const lista = section.querySelector(".productos-lista");
+                    productosCat.forEach(p => {
+                        lista.innerHTML += `
+                            <div class="producto">
+                                <img src="../uploads/productos/${p.imagen}" onerror="this.src='https://via.placeholder.com/150?text=${p.nombre}'" alt="${p.nombre}">
+                                <h3>${p.nombre}</h3>
+                                <p class="precio">${Utils.formatCurrency(p.precio)}</p>
+                                <p class="meta">Stock: ${p.stock} | Unidades: ${p.cantidad_prendas || 1}</p>
+                                <button onclick="agregar(${p.id})" ${p.stock < 1 ? "disabled" : ""}>
+                                    ${p.stock < 1 ? "Sin stock" : "Agregar al carrito"}
+                                </button>
+                            </div>
+                        `;
+                    });
+                    contenedor.appendChild(section);
+                });
+
+                if (productos.length === 0) {
+                    contenedor.innerHTML = "<p>No hay productos disponibles por el momento.</p>";
+                }
+            } catch (err) {
+                document.getElementById("contenedor-tienda").innerHTML = "<p>Error al cargar productos.</p>";
+            }
+        }
+
+        function agregar(id) {
+            // Necesitamos los datos del producto, los buscamos en la UI o volvemos a pedir?
+            // Para simplicidad, volveremos a usar localStorage para el carrito temporalmente
+            // pero los datos vienen de la API.
+            fetch("/api/productos/").then(r => r.json()).then(productos => {
+                const prod = productos.find(x => x.id === id);
+                if (!prod || prod.stock < 1) return;
+
+                const existe = carrito.find(x => x.id === id);
+                existe ? existe.cantidad++ : carrito.push({...prod, cantidad: 1});
+
+                Utils.storage.set("carrito", carrito);
+                Utils.updateCartCounter();
+                alert("✅ Agregado");
+            });
+        }
+    </script>
+</body>
+</html>

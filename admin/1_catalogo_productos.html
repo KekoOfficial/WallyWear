@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Catálogo - Wally Wear</title>
+    <script src="js/seguridad.js"></script>
+    <link rel="stylesheet" href="../public/css/estilos_generales.css">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --accent: #007bff;
+            --danger: #dc3545;
+            --bg: #f4f7f6;
+        }
+        body { background-color: var(--bg); font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .back-link { display: inline-block; margin-bottom: 1rem; color: var(--accent); text-decoration: none; }
+
+        section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        h2 { margin-top: 0; border-bottom: 2px solid var(--bg); padding-bottom: 0.5rem; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-accent { background: var(--accent); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+
+        .image-upload-box {
+            border: 2px dashed #ddd;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .image-upload-box:hover { border-color: var(--accent); }
+        #preview-img { max-width: 150px; margin-top: 10px; border-radius: 8px; display: none; }
+
+        .categoria-group { margin-top: 2rem; }
+        .categoria-title {
+            background: #eee;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prod-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto auto;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .prod-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+        .prod-info h4 { margin: 0; }
+        .prod-info p { margin: 5px 0 0; color: #666; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="menu_principal.html" class="back-link">← Volver al Panel Principal</a>
+        <h1>📦 Gestión de Catálogo</h1>
+
+        <section>
+            <h2>Agregar Nuevo Producto</h2>
+            <div class="form-grid">
+                <input type="text" id="nombre" placeholder="Nombre del producto">
+                <input type="number" id="precio" placeholder="Precio (Gs)">
+                <input type="number" id="stock" placeholder="Stock Total">
+                <input type="number" id="cantidad_prendas" placeholder="Unidades por lote">
+                <input type="text" id="categoria" placeholder="Categoría">
+            </div>
+
+            <div class="image-upload-box" onclick="document.getElementById('input-foto').click()">
+                <p id="upload-text">📸 Click para seleccionar imagen</p>
+                <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="previsualizar(this)">
+                <img id="preview-img">
+                <input type="hidden" id="imagen-nombre">
+            </div>
+
+            <button class="btn-primary" style="width: 100%; margin-top: 1.5rem;" onclick="guardarProducto()">Guardar Producto</button>
+        </section>
+
+        <section>
+            <h2>Lista de Productos</h2>
+            <div id="lista-productos"></div>
+        </section>
+    </div>
+
+    <script src="../public/js/utils.js"></script>
+    <script>
+        window.onload = () => {
+            renderProductos();
+        };
+
+        function previsualizar(input) {
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                document.getElementById('imagen-nombre').value = fileName;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.getElementById('preview-img');
+                    img.src = e.target.result;
+                    img.style.display = 'inline-block';
+                    document.getElementById('upload-text').style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function guardarProducto() {
+            const nombre = document.getElementById("nombre").value.trim();
+            const precio = document.getElementById("precio").value;
+            const stock = document.getElementById("stock").value;
+            const cantidad_prendas = document.getElementById("cantidad_prendas").value;
+            const categoria = document.getElementById("categoria").value.trim();
+            const inputFoto = document.getElementById("input-foto");
+
+            if (!nombre || !precio || !stock || !categoria || !inputFoto.files[0]) {
+                return alert("Por favor complete todos los campos y seleccione una imagen");
+            }
+
+            const formData = new FormData();
+            formData.append("nombre", nombre);
+            formData.append("precio", precio);
+            formData.append("stock", stock);
+            formData.append("cantidad_prendas", cantidad_prendas || 1);
+            formData.append("categoria", categoria);
+            formData.append("imagen", inputFoto.files[0]);
+
+            try {
+                const response = await fetch("/api/productos/", {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert("✅ Producto guardado");
+                    location.reload();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        }
+
+        async function renderProductos() {
+            const container = document.getElementById("lista-productos");
+            try {
+                const productos = await Utils.api.fetch("/api/productos/");
+                container.innerHTML = "";
+
+                if (productos.length === 0) {
+                    container.innerHTML = "<p>No hay productos registrados.</p>";
+                    return;
+                }
+
+                productos.forEach(p => {
+                    const item = document.createElement("div");
+                    item.className = "prod-item";
+                    item.innerHTML = `
+                        <img src="../uploads/productos/${p.imagen}" onerror="this.src='https://via.placeholder.com/80?text=${p.nombre}'">
+                        <div class="prod-info">
+                            <h4>${p.nombre}</h4>
+                            <p>${Utils.formatCurrency(p.precio)} | Stock: ${p.stock} | Cat: ${p.categoria}</p>
+                        </div>
+                        <button class="btn-danger" onclick="eliminarProducto(${p.id})">Eliminar</button>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (err) {
+                container.innerHTML = "<p>Error al cargar productos.</p>";
+            }
+        }
+
+        async function eliminarProducto(id) {
+            if (!confirm("¿Seguro?")) return;
+            try {
+                await Utils.api.fetch(`/api/productos/${id}`, { method: 'DELETE' });
+                renderProductos();
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
